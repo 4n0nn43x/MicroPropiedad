@@ -1,0 +1,38 @@
+{
+  "name": "micropropiedad-btc",
+  "version": "0.1.0",
+  "description": "Fractional real estate tokenization platform on Stacks/sBTC",
+  "keywords": [
+    "stacks",
+    "sbtc",
+    "real-estate",
+    "tokenization",
+    "rwa",
+    "defi",
+    "latam"
+  ],
+  "license": "MIT",
+  "author": "MicroPropiedad Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/micropropiedad-btc"
+  },
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev:contracts": "cd contracts && clarinet devnet start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "test:contracts": "cd contracts && clarinet test",
+    "deploy:testnet": "cd contracts && clarinet deploy --testnet",
+    "deploy:mainnet": "cd contracts && clarinet deploy --mainnet",
+    "lint": "npm run lint --workspaces",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "prettier": "^3.1.1"
+  }
+}

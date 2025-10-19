@@ -1,0 +1,33 @@
+[project]
+name = 'contracts'
+description = ''
+authors = []
+telemetry = true
+cache_dir = './.cache'
+requirements = []
+[contracts.property]
+path = 'contracts/property.clar'
+clarity_version = 3
+epoch = 'latest'
+
+[contracts.property-factory]
+path = 'contracts/property-factory.clar'
+clarity_version = 3
+epoch = 'latest'
+
+[contracts.sip010-ft-trait]
+path = 'contracts/sip010-ft-trait.clar'
+clarity_version = 3
+epoch = 'latest'
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
