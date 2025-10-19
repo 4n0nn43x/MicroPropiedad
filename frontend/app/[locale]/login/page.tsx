@@ -1,4 +1,5 @@
-import { useTranslations } from 'next-intl';
+'use client';
+
 import WalletConnect from '@/components/wallet/WalletConnect';
 import { Shield, Zap, Lock } from 'lucide-react';
 

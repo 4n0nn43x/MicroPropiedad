@@ -1,11 +1,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Hero() {
   const t = useTranslations('landing.hero');
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
 
   return (
     <section className="relative h-screen flex items-center">
@@ -32,7 +35,7 @@ export default function Hero() {
           {t('subtitle')}
         </p>
         <Link
-          href="/login"
+          href={`/${locale}/login`}
           className="inline-block bg-secondary-500 hover:bg-secondary-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
         >
           {t('cta')}

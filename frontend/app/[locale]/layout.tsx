@@ -14,8 +14,12 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body>
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <Header />
           <main className="min-h-screen pt-16">
@@ -31,3 +35,6 @@ export default async function LocaleLayout({
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'es' }];
 }
+
+// Force dynamic rendering for all pages
+export const dynamic = 'force-dynamic';

@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useParams, useRouter } from 'next/navigation';
 import { showConnect } from '@stacks/connect';
 import { AppConfig, UserSession } from '@stacks/connect';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function WalletConnect() {
   const t = useTranslations('login.wallets');
   const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
   const [connecting, setConnecting] = useState(false);
 
   const wallets = [
@@ -45,7 +47,7 @@ export default function WalletConnect() {
           icon: window.location.origin + '/logo.svg',
         },
         onFinish: () => {
-          router.push('/marketplace');
+          router.push(`/${locale}/marketplace`);
         },
         userSession,
       });
