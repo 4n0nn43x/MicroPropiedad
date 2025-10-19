@@ -1,5 +1,5 @@
+import { openContractCall } from '@stacks/connect';
 import {
-  makeContractCall,
   bufferCV,
   uintCV,
   stringAsciiCV,
@@ -8,7 +8,7 @@ import {
   PostConditionMode,
   AnchorMode
 } from '@stacks/transactions';
-import { network, userSession } from './wallet';
+import { network } from './wallet';
 
 const FACTORY_CONTRACT = process.env.NEXT_PUBLIC_FACTORY_CONTRACT || 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.property-factory';
 
@@ -17,22 +17,20 @@ export const purchaseShares = async (
   numShares: number
 ) => {
   const functionArgs = [uintCV(numShares)];
+  const [contractAddress, contractName] = propertyContract.split('.');
 
-  const txOptions = {
-    contractAddress: propertyContract.split('.')[0],
-    contractName: propertyContract.split('.')[1],
+  await openContractCall({
+    contractAddress,
+    contractName,
     functionName: 'purchase-shares',
     functionArgs,
     network,
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
-    onFinish: (data: any) => {
+    onFinish: (data) => {
       console.log('Transaction submitted:', data.txId);
-      return data;
     },
-  };
-
-  return await makeContractCall(txOptions);
+  });
 };
 
 export const claimPayout = async (
@@ -40,22 +38,20 @@ export const claimPayout = async (
   roundId: number
 ) => {
   const functionArgs = [uintCV(roundId)];
+  const [contractAddress, contractName] = propertyContract.split('.');
 
-  const txOptions = {
-    contractAddress: propertyContract.split('.')[0],
-    contractName: propertyContract.split('.')[1],
+  await openContractCall({
+    contractAddress,
+    contractName,
     functionName: 'claim-payout',
     functionArgs,
     network,
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Allow,
-    onFinish: (data: any) => {
+    onFinish: (data) => {
       console.log('Claim submitted:', data.txId);
-      return data;
     },
-  };
-
-  return await makeContractCall(txOptions);
+  });
 };
 
 export const getPropertyInfo = async (propertyContract: string) => {
