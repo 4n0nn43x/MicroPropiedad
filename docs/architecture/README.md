@@ -5,46 +5,46 @@
 MicroPropiedad is a decentralized platform for fractional real estate ownership built on Stacks blockchain, leveraging Bitcoin's security through sBTC.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │                        USER LAYER                            │
-├─────────────────────────────────────────────────────────────┤
+├──────────────────────────────────────────────────────────────┤
 │  Investors  │  Property Owners  │  Oracles  │  Platform Admin│
-└──────┬───────────────┬──────────────┬────────────────┬──────┘
+└──────┬───────────────┬──────────────┬────────────────┬───────┘
        │               │              │                │
        v               v              v                v
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │                    FRONTEND (Next.js dApp)                   │
-│  - Wallet Integration (Xverse, Leather, Hiro)               │
+│  - Wallet Integration (Xverse, Leather, Hiro)                │
 │  - Property Marketplace                                      │
 │  - Investor Dashboard                                        │
-│  - i18n (EN/ES)                                             │
-└──────┬──────────────────────────────────────────────────────┘
+│  - i18n (EN/ES)                                              │
+└──────┬───────────────────────────────────────────────────────┘
        │
        v
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │                    BACKEND (Node.js API)                     │
-│  - Event Indexing                                           │
+│  - Event Indexing                                            │
 │  - Oracle Service (Revenue Verification)                     │
-│  - Off-chain Data (KYC, Documents)                          │
+│  - Off-chain Data (KYC, Documents)                           │
 │  - Analytics & Reporting                                     │
-└──────┬──────────────────────────────────────────────────────┘
+└──────┬───────────────────────────────────────────────────────┘
        │
        v
-┌─────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────┐
 │              STACKS BLOCKCHAIN LAYER                         │
 │                                                              │
-│  ┌──────────────────┐         ┌───────────────────┐        │
-│  │ PropertyFactory  │◄────────┤  Property (1..N)  │        │
-│  │                  │         │                   │        │
-│  │  - Registry      │         │  - SIP-010 Token  │        │
-│  │  - Metadata      │         │  - Fractional     │        │
-│  │  - Statistics    │         │  - Payouts        │        │
-│  └──────────────────┘         │  - Governance     │        │
-│                                └───────────────────┘        │
+│  ┌──────────────────┐         ┌───────────────────┐          │
+│  │ PropertyFactory  │◄────────┤  Property (1..N)  │          │
+│  │                  │         │                   │          │
+│  │  - Registry      │         │  - SIP-010 Token  │          │
+│  │  - Metadata      │         │  - Fractional     │          │
+│  │  - Statistics    │         │  - Payouts        │          │
+│  └──────────────────┘         │  - Governance     │          │
+│                               └───────────────────┘          │
 │                                                              │
-│  ┌──────────────────┐                                       │
-│  │  sip010-ft-trait │ ◄── Standard Interface                │
-│  └──────────────────┘                                       │
+│  ┌──────────────────┐                                        │
+│  │  sip010-ft-trait │ ◄── Standard Interface                 │
+│  └──────────────────┘                                        │
 └──────────────────────────────────────────────────────────────┘
 ```
 
