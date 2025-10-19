@@ -1,0 +1,252 @@
+{
+  "common": {
+    "buttons": {
+      "connect": "Conectar Cartera",
+      "disconnect": "Desconectar",
+      "buy": "Comprar Acciones",
+      "claim": "Reclamar Pago",
+      "explore": "Explorar Propiedades",
+      "learnMore": "Más Información",
+      "getStarted": "Comenzar",
+      "viewDetails": "Ver Detalles",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar"
+    },
+    "labels": {
+      "shares": "Acciones",
+      "price": "Precio",
+      "roi": "ROI",
+      "location": "Ubicación",
+      "status": "Estado",
+      "totalSupply": "Suministro Total",
+      "available": "Disponible",
+      "sold": "Vendido",
+      "language": "Idioma"
+    },
+    "status": {
+      "active": "Activo",
+      "soldOut": "Agotado",
+      "upcoming": "Próximamente",
+      "paused": "Pausado"
+    },
+    "errors": {
+      "walletNotConnected": "Por favor conecta tu cartera primero",
+      "transactionFailed": "La transacción falló",
+      "insufficientBalance": "Saldo insuficiente",
+      "networkError": "Error de red. Por favor intenta de nuevo.",
+      "invalidInput": "Entrada inválida"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "Invierte en Bienes Raíces con Bitcoin",
+      "subtitle": "Propiedad fraccionada en blockchain Stacks. Comienza a invertir desde $10.",
+      "cta": "Comenzar a Invertir"
+    },
+    "features": {
+      "title": "¿Por qué MicroPropiedad?",
+      "accessibility": {
+        "title": "Accesible para Todos",
+        "description": "Invierte en bienes raíces premium desde solo $10. Sin capital mínimo requerido."
+      },
+      "passive": {
+        "title": "Ingresos Pasivos",
+        "description": "Gana ingresos por alquiler distribuidos automáticamente a tu cartera cada mes."
+      },
+      "liquid": {
+        "title": "Liquidez Instantánea",
+        "description": "Compra y vende acciones de propiedades en cualquier momento en nuestro mercado secundario."
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "step1": {
+        "title": "Conecta Tu Cartera",
+        "description": "Usa Xverse, Leather o Hiro para comenzar"
+      },
+      "step2": {
+        "title": "Explora Propiedades",
+        "description": "Descubre bienes raíces tokenizados en Latinoamérica"
+      },
+      "step3": {
+        "title": "Compra Acciones",
+        "description": "Adquiere propiedad fraccionada con sBTC o STX"
+      },
+      "step4": {
+        "title": "Gana Retornos",
+        "description": "Recibe ingresos mensuales por alquiler automáticamente"
+      }
+    },
+    "stats": {
+      "properties": "Propiedades Listadas",
+      "investors": "Inversores Activos",
+      "volume": "Volumen Total"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "q1": {
+        "question": "¿Qué es la propiedad fraccionada?",
+        "answer": "La propiedad fraccionada te permite poseer una porción de un inmueble comprando acciones. Cada acción representa un porcentaje del valor de la propiedad y te da derecho a ingresos proporcionales por alquiler."
+      },
+      "q2": {
+        "question": "¿Cómo recibo los ingresos por alquiler?",
+        "answer": "Los ingresos por alquiler se distribuyen automáticamente a todos los accionistas proporcionalmente. Puedes reclamar tu parte directamente desde tu panel en cualquier momento."
+      },
+      "q3": {
+        "question": "¿Mi inversión es segura?",
+        "answer": "Todas las transacciones están aseguradas por la blockchain Stacks y la prueba de trabajo de Bitcoin. Las propiedades están estructuradas legalmente a través de SPVs (Vehículos de Propósito Especial) para protección del inversor."
+      },
+      "q4": {
+        "question": "¿Puedo vender mis acciones?",
+        "answer": "¡Sí! Puedes listar tus acciones en nuestro mercado secundario y venderlas a otros inversores en cualquier momento."
+      }
+    }
+  },
+  "login": {
+    "title": "Conecta Tu Cartera",
+    "subtitle": "Elige tu cartera Stacks preferida para comenzar",
+    "wallets": {
+      "xverse": {
+        "name": "Cartera Xverse",
+        "description": "La cartera Stacks más popular con soporte Bitcoin integrado"
+      },
+      "leather": {
+        "name": "Cartera Leather",
+        "description": "Cartera de código abierto anteriormente conocida como Hiro Wallet"
+      },
+      "hiro": {
+        "name": "Cartera Hiro",
+        "description": "Cartera amigable para desarrolladores con funciones avanzadas"
+      }
+    },
+    "newToStacks": {
+      "title": "¿Nuevo en Stacks?",
+      "description": "Stacks trae contratos inteligentes a Bitcoin. Elige una cartera arriba para crear tu cuenta - es gratis y toma menos de 2 minutos.",
+      "learnMore": "Aprende sobre Stacks"
+    },
+    "security": {
+      "title": "Tus Llaves, Tu Cripto",
+      "points": [
+        "Sin custodia: Siempre controlas tus activos",
+        "Seguro: Protegido por la prueba de trabajo de Bitcoin",
+        "Privado: No se requiere información personal"
+      ]
+    }
+  },
+  "marketplace": {
+    "title": "Mercado de Propiedades",
+    "subtitle": "Explora oportunidades de bienes raíces tokenizados",
+    "filters": {
+      "title": "Filtros",
+      "location": "Ubicación",
+      "priceRange": "Rango de Precio",
+      "roiRange": "Rango de ROI",
+      "status": "Estado",
+      "sortBy": "Ordenar Por",
+      "sortOptions": {
+        "newest": "Más Recientes",
+        "priceAsc": "Precio: Menor a Mayor",
+        "priceDesc": "Precio: Mayor a Menor",
+        "roiDesc": "Mayor ROI"
+      }
+    },
+    "noResults": "No se encontraron propiedades. Intenta ajustar tus filtros.",
+    "loadMore": "Cargar Más Propiedades"
+  },
+  "property": {
+    "details": {
+      "overview": "Resumen",
+      "financials": "Finanzas",
+      "documents": "Documentos",
+      "activity": "Actividad"
+    },
+    "stats": {
+      "sharePrice": "Precio por Acción",
+      "totalShares": "Acciones Totales",
+      "availableShares": "Disponibles",
+      "estimatedROI": "ROI Estimado",
+      "totalRaised": "Total Recaudado",
+      "investors": "Inversores"
+    },
+    "purchase": {
+      "title": "Comprar Acciones",
+      "selectAmount": "Número de Acciones",
+      "totalCost": "Costo Total",
+      "estimatedReturns": "Retornos Mensuales Estimados",
+      "fees": "Comisión de Plataforma (2.5%)",
+      "confirm": "Confirmar Compra"
+    },
+    "documents": {
+      "propertyTitle": "Título de Propiedad",
+      "legalStructure": "Estructura Legal",
+      "financialReport": "Informe Financiero",
+      "inspectionReport": "Informe de Inspección"
+    }
+  },
+  "dashboard": {
+    "title": "Mi Panel",
+    "tabs": {
+      "portfolio": "Portafolio",
+      "holdings": "Tenencias",
+      "activity": "Actividad",
+      "payouts": "Pagos"
+    },
+    "portfolio": {
+      "totalValue": "Valor Total del Portafolio",
+      "totalInvested": "Total Invertido",
+      "totalReturns": "Retornos Totales",
+      "roi": "ROI General"
+    },
+    "holdings": {
+      "property": "Propiedad",
+      "shares": "Acciones",
+      "value": "Valor Actual",
+      "returns": "Retornos Totales",
+      "actions": "Acciones"
+    },
+    "payouts": {
+      "available": "Disponible para Reclamar",
+      "claimed": "Total Reclamado",
+      "pending": "Pendiente",
+      "history": "Historial de Pagos",
+      "claimAll": "Reclamar Todo"
+    },
+    "activity": {
+      "recent": "Actividad Reciente",
+      "type": {
+        "purchase": "Compra",
+        "claim": "Reclamo",
+        "transfer": "Transferencia"
+      }
+    }
+  },
+  "footer": {
+    "company": {
+      "title": "Empresa",
+      "about": "Sobre Nosotros",
+      "careers": "Carreras",
+      "press": "Kit de Prensa"
+    },
+    "product": {
+      "title": "Producto",
+      "marketplace": "Mercado",
+      "howItWorks": "Cómo Funciona",
+      "pricing": "Precios"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos de Servicio",
+      "privacy": "Política de Privacidad",
+      "compliance": "Cumplimiento"
+    },
+    "social": {
+      "title": "Comunidad",
+      "twitter": "Twitter",
+      "discord": "Discord",
+      "telegram": "Telegram"
+    },
+    "copyright": "© 2025 MicroPropiedad. Construido en Stacks."
+  }
+}
