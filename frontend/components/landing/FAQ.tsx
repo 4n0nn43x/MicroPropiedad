@@ -28,30 +28,37 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-16">
-          {t('title')}
-        </h2>
+    <section className="py-20 bg-dark-bg relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-500/5 rounded-full blur-3xl" />
+
+      <div className="max-w-4xl mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-display font-bold mb-4">
+            <span className="glow-text">{t('title')}</span>
+          </h2>
+          <p className="text-gray-400 text-lg">Everything you need to know</p>
+        </div>
+
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-lg overflow-hidden"
+              className="glass-card border border-dark-border overflow-hidden"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition"
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-dark-hover transition"
               >
-                <span className="font-semibold text-lg pr-4">{faq.question}</span>
+                <span className="font-semibold text-lg pr-4 text-white">{faq.question}</span>
                 {openIndex === index ? (
-                  <ChevronUp className="flex-shrink-0 text-primary-500" size={24} />
+                  <ChevronUp className="flex-shrink-0 text-primary-400" size={24} />
                 ) : (
-                  <ChevronDown className="flex-shrink-0 text-gray-400" size={24} />
+                  <ChevronDown className="flex-shrink-0 text-gray-500" size={24} />
                 )}
               </button>
               {openIndex === index && (
-                <div className="px-6 pb-6 text-gray-600">
+                <div className="px-6 pb-6 text-gray-400 leading-relaxed">
                   {faq.answer}
                 </div>
               )}

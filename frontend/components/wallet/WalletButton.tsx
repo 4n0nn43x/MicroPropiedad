@@ -49,7 +49,7 @@ export default function WalletButton() {
     return (
       <button
         onClick={handleDisconnect}
-        className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-green to-accent-cyan text-white rounded-xl hover:shadow-glow transition-all font-medium"
       >
         <Wallet size={18} />
         <span className="hidden md:inline">{truncateAddress(address)}</span>
@@ -61,7 +61,7 @@ export default function WalletButton() {
   return (
     <button
       onClick={handleConnect}
-      className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+      className="btn btn-primary"
     >
       <Wallet size={18} />
       <span>{t('connect')}</span>

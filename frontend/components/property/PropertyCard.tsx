@@ -3,12 +3,10 @@
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, TrendingUp, Users } from 'lucide-react';
-import Badge from '@/components/ui/Badge';
-import { Property } from '@/types/property';
+import { MapPin, TrendingUp, DollarSign, Percent } from 'lucide-react';
 
 interface PropertyCardProps {
-  property: Property;
+  property: any;
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
@@ -17,90 +15,102 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
   const progressPercent = (property.soldShares / property.totalShares) * 100;
 
-  const statusVariant = {
-    'active': 'success' as const,
-    'sold-out': 'danger' as const,
-    'upcoming': 'info' as const,
-  }[property.status];
+  const statusColors: Record<string, string> = {
+    'active': 'bg-accent-green',
+    'sold-out': 'bg-accent-purple',
+    'upcoming': 'bg-accent-cyan',
+  };
 
-  const statusLabel = {
+  const statusLabels: Record<string, string> = {
     'active': 'Active',
     'sold-out': 'Sold Out',
     'upcoming': 'Coming Soon',
-  }[property.status];
+  };
 
   return (
     <Link href={`/${locale}/marketplace/${property.id}`}>
-      <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+      <div className="glass-card-hover overflow-hidden group cursor-pointer">
         {/* Image */}
-        <div className="relative h-56 overflow-hidden">
+        <div className="relative h-64 overflow-hidden">
           <Image
-            src={property.image}
+            src={property.imageUrl}
             alt={property.name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-300"
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/50 to-transparent" />
+
+          {/* Status Badge */}
           <div className="absolute top-4 right-4">
-            <Badge variant={statusVariant}>
-              {statusLabel}
-            </Badge>
-          </div>
-          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg">
-            <span className="font-bold text-primary-600">{property.propertyType}</span>
+            <div className={`${statusColors[property.status]} px-3 py-1.5 rounded-lg shadow-lg`}>
+              <span className="text-xs font-bold text-white">{statusLabels[property.status]}</span>
+            </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-6">
-          <h3 className="text-xl font-bold mb-2 group-hover:text-primary-600 transition">
-            {property.name}
-          </h3>
-
-          <div className="flex items-center text-gray-600 mb-4">
-            <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-            <span className="text-sm">{property.location}</span>
+          {/* Title & Location */}
+          <div className="mb-4">
+            <h3 className="text-xl font-display font-bold mb-2 text-white group-hover:text-primary-400 transition">
+              {property.name}
+            </h3>
+            <div className="flex items-center text-gray-400">
+              <MapPin size={14} className="mr-1.5 flex-shrink-0" />
+              <span className="text-sm">{property.location}</span>
+            </div>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-sm text-gray-600">Share Price</p>
-              <p className="text-lg font-bold text-primary-600">${property.sharePrice}</p>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-dark-bg p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign size={16} className="text-accent-green" />
+                <p className="text-xs text-gray-500">Share Price</p>
+              </div>
+              <p className="text-lg font-bold text-white">{property.sharePrice} STX</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Est. ROI</p>
-              <p className="text-lg font-bold text-success flex items-center">
-                <TrendingUp className="w-4 h-4 mr-1" />
+            <div className="bg-dark-bg p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <Percent size={16} className="text-primary-400" />
+                <p className="text-xs text-gray-500">ROI</p>
+              </div>
+              <p className="text-lg font-bold text-white flex items-center">
                 {property.roi}%
               </p>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-3">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">
-                {property.soldShares.toLocaleString()} / {property.totalShares.toLocaleString()} shares
-              </span>
-              <span className="font-bold text-primary-600">{progressPercent.toFixed(0)}%</span>
+          <div className="mb-4">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-400">Progress</span>
+              <span className="font-bold text-white">{progressPercent.toFixed(1)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-dark-bg rounded-full h-2 overflow-hidden">
               <div
-                className="bg-gradient-to-r from-primary-500 to-primary-600 h-2.5 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
+                className="bg-gradient-to-r from-primary-500 via-accent-purple to-accent-pink h-2 rounded-full transition-all duration-500 shadow-glow"
+                style={{ width: `${Math.min(progressPercent, 100)}%` }}
               />
+            </div>
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>{property.soldShares.toLocaleString()} sold</span>
+              <span>{property.totalShares.toLocaleString()} total</span>
             </div>
           </div>
 
-          {/* Footer Stats */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            <div className="flex items-center text-sm text-gray-600">
-              <Users className="w-4 h-4 mr-1" />
-              <span>{property.stats.totalInvestors} investors</span>
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-4 border-t border-dark-border">
+            <div className="flex items-center gap-2">
+              <TrendingUp size={16} className="text-accent-green" />
+              <span className="text-sm text-gray-400">
+                ${property.propertyValue.toLocaleString()}
+              </span>
             </div>
-            <div className="text-sm text-gray-600">
-              Total: ${property.totalValue.toLocaleString()}
-            </div>
+            <button className="text-sm font-medium text-primary-400 hover:text-primary-300 transition">
+              View Details →
+            </button>
           </div>
         </div>
       </div>

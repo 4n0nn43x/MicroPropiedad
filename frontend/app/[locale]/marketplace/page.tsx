@@ -1,186 +1,308 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
-import { Search, SlidersHorizontal } from 'lucide-react';
-import PropertyCard from '@/components/property/PropertyCard';
-import { demoProperties } from '@/lib/demoData';
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { Building2, TrendingUp, MapPin, Clock } from 'lucide-react';
 
 export default function MarketplacePage() {
-  const t = useTranslations('marketplace');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('newest');
-  const [showFilters, setShowFilters] = useState(false);
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const [activeCategory, setActiveCategory] = useState('popular');
 
-  // Filter and sort properties
-  const filteredProperties = useMemo(() => {
-    let filtered = demoProperties;
+  const categories = [
+    { id: 'popular', label: 'Popular', icon: '🔥' },
+    { id: 'arts', label: 'Arts', icon: '🎨' },
+    { id: 'games', label: 'Games', icon: '🎮' },
+    { id: 'music', label: 'Music', icon: '🎵' },
+    { id: 'sports', label: 'Sports', icon: '⚽' },
+    { id: 'photography', label: 'Photography', icon: '📸' },
+  ];
 
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.location.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+  // Mock properties data
+  const properties = [
+    {
+      id: 1,
+      name: 'The Future wave #23',
+      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
+      author: '@hgjftrentv',
+      avatar: '1',
+      currentBid: '0.24 BTC',
+      endingIn: '12h 14m 16s',
+      verified: true,
+    },
+    {
+      id: 2,
+      name: 'Astro World #244',
+      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
+      author: '@nftrsmook',
+      avatar: '2',
+      currentBid: '0.24 BTC',
+      endingIn: '12h 14m 16s',
+      verified: true,
+    },
+    {
+      id: 3,
+      name: 'Cyber Art #234',
+      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
+      author: '@tnrsmft',
+      avatar: '3',
+      currentBid: '0.24 BTC',
+      endingIn: '7h 09m 20s',
+      verified: true,
+    },
+    {
+      id: 4,
+      name: 'Modern Villa #156',
+      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9',
+      author: '@realestpro',
+      avatar: '4',
+      currentBid: '0.18 BTC',
+      endingIn: '5h 30m 45s',
+      verified: true,
+    },
+    {
+      id: 5,
+      name: 'Urban Loft #089',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
+      author: '@cityhomes',
+      avatar: '5',
+      currentBid: '0.32 BTC',
+      endingIn: '18h 45m 12s',
+      verified: false,
+    },
+    {
+      id: 6,
+      name: 'Beach House #421',
+      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811',
+      author: '@oceanview',
+      avatar: '6',
+      currentBid: '0.45 BTC',
+      endingIn: '22h 10m 30s',
+      verified: true,
+    },
+    {
+      id: 7,
+      name: 'Mountain Retreat #302',
+      image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde',
+      author: '@naturelux',
+      avatar: '7',
+      currentBid: '0.28 BTC',
+      endingIn: '9h 22m 18s',
+      verified: true,
+    },
+    {
+      id: 8,
+      name: 'Downtown Penthouse #777',
+      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
+      author: '@skylineking',
+      avatar: '8',
+      currentBid: '0.55 BTC',
+      endingIn: '15h 08m 42s',
+      verified: true,
+    },
+  ];
 
-    // Status filter
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(p => p.status === filterStatus);
-    }
-
-    // Sort
-    filtered = [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case 'priceAsc':
-          return a.sharePrice - b.sharePrice;
-        case 'priceDesc':
-          return b.sharePrice - a.sharePrice;
-        case 'roiDesc':
-          return b.roi - a.roi;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [searchQuery, filterStatus, sortBy]);
-
-  const stats = {
-    total: demoProperties.length,
-    active: demoProperties.filter(p => p.status === 'active').length,
-    soldOut: demoProperties.filter(p => p.status === 'sold-out').length,
-  };
+  const topNFTs = [
+    {
+      collection: 'Cool Cyber Apes',
+      author: '@ryhogsmon',
+      avatar: '4',
+      volume: '0.24 BTC',
+      change: '+25%',
+      positive: true,
+      owners: '5.5k',
+      items: '12.5k',
+    },
+    {
+      collection: 'Shadow Cube',
+      author: '@ryhogsmon',
+      avatar: '5',
+      volume: '0.24 BTC',
+      change: '-15%',
+      positive: false,
+      owners: '5.5k',
+      items: '12.5k',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Property Marketplace</h1>
-          <p className="text-xl text-gray-600">
-            Explore tokenized real estate opportunities in Latin America
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 text-center shadow-md">
-            <p className="text-4xl font-bold text-primary-600">{stats.total}</p>
-            <p className="text-gray-600 mt-2">Total Properties</p>
-          </div>
-          <div className="bg-white rounded-xl p-6 text-center shadow-md">
-            <p className="text-4xl font-bold text-success">{stats.active}</p>
-            <p className="text-gray-600 mt-2">Active</p>
-          </div>
-          <div className="bg-white rounded-xl p-6 text-center shadow-md">
-            <p className="text-4xl font-bold text-gray-400">{stats.soldOut}</p>
-            <p className="text-gray-600 mt-2">Sold Out</p>
-          </div>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-xl p-6 shadow-md mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search properties..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+    <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto">
+      {/* Hero Banner */}
+      <div className="relative h-64 rounded-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-purple" />
+        <div className="absolute inset-0 flex items-center justify-between px-12">
+          {/* Left Content */}
+          <div className="max-w-xl space-y-4">
+            <h1 className="text-5xl font-display font-bold text-white">
+              Discover, Collect &<br />Create your own NFT
+            </h1>
+            <p className="text-white/90 text-lg">
+              Search items, collection, accounts
+            </p>
+            <div className="flex gap-4">
+              <button className="px-8 py-3 bg-white text-primary-600 rounded-xl font-semibold hover:bg-white/90 transition">
+                Discover Now
+              </button>
+              <button className="px-8 py-3 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition">
+                Create your NFT
+              </button>
             </div>
+          </div>
 
-            {/* Filter Button */}
+          {/* Right Image */}
+          <div className="relative w-64 h-64">
+            <img
+              src="https://i.pinimg.com/originals/36/b8/ee/36b8eeb48c6bc1b6bf8e0a1f8b6c1a95.png"
+              alt="NFT Character"
+              className="w-full h-full object-contain drop-shadow-2xl"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* All NFTs Section */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">
+            All NFTS <span className="text-gray-500 text-lg font-normal">2,345,678 items</span>
+          </h2>
+          <button className="text-primary-400 hover:text-primary-300 transition">See all</button>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+          {categories.map((cat) => (
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition whitespace-nowrap ${
+                activeCategory === cat.id
+                  ? 'bg-dark-card text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-dark-card/50'
+              }`}
             >
-              <SlidersHorizontal size={20} />
-              <span>Filters</span>
+              <span>{cat.icon}</span>
+              <span>{cat.label}</span>
             </button>
+          ))}
+        </div>
+
+        {/* NFT Grid */}
+        <div className="grid grid-cols-4 gap-6">
+          {properties.map((property) => (
+            <Link
+              key={property.id}
+              href={`/${locale}/marketplace/${property.id}`}
+              className="glass-card overflow-hidden group hover:scale-[1.02] transition-transform"
+            >
+              {/* Image */}
+              <div className="relative h-64">
+                <Image
+                  src={property.image}
+                  alt={property.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="p-5 space-y-4">
+                {/* Title & Author */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-bold text-white mb-1">{property.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full overflow-hidden">
+                        <img
+                          src={`https://i.pravatar.cc/150?img=${property.avatar}`}
+                          alt="Author"
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <span className="text-sm text-gray-400">{property.author}</span>
+                    </div>
+                  </div>
+                  {property.verified && (
+                    <div className="w-6 h-6 rounded-full bg-accent-green flex items-center justify-center">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bid Info */}
+                <div className="flex items-center justify-between pt-4 border-t border-dark-border">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Current Bid</p>
+                    <p className="font-bold text-white">{property.currentBid}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 mb-1">Ending in</p>
+                    <p className="font-bold text-white text-sm">{property.endingIn}</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Top NFTs Table */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">
+            Top NFTS <span className="text-gray-500 text-lg font-normal">564 Creators</span>
+          </h2>
+          <button className="text-primary-400 hover:text-primary-300 transition">See all</button>
+        </div>
+
+        <div className="glass-card overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-5 gap-4 px-6 py-4 border-b border-dark-border bg-dark-card/30">
+            <div className="text-sm font-medium text-gray-400">Collection</div>
+            <div className="text-sm font-medium text-gray-400">Volume</div>
+            <div className="text-sm font-medium text-gray-400">24h %</div>
+            <div className="text-sm font-medium text-gray-400">Owners</div>
+            <div className="text-sm font-medium text-gray-400">Items</div>
           </div>
 
-          {/* Expandable Filters */}
-          {showFilters && (
-            <div className="grid md:grid-cols-3 gap-4 mt-4 pt-4 border-t">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Status
-                </label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="sold-out">Sold Out</option>
-                  <option value="upcoming">Coming Soon</option>
-                </select>
+          {/* Table Body */}
+          <div className="divide-y divide-dark-border">
+            {topNFTs.map((nft, idx) => (
+              <div
+                key={idx}
+                className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-dark-hover transition"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-accent-purple">
+                    <img
+                      src={`https://i.pravatar.cc/150?img=${nft.avatar}`}
+                      alt={nft.collection}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">{nft.collection}</p>
+                    <p className="text-xs text-gray-500">{nft.author}</p>
+                  </div>
+                </div>
+                <div className="flex items-center text-white font-medium">{nft.volume}</div>
+                <div className="flex items-center">
+                  <span className={`${nft.positive ? 'text-accent-green' : 'text-red-400'} font-medium`}>
+                    {nft.change}
+                  </span>
+                </div>
+                <div className="flex items-center text-gray-400">{nft.owners}</div>
+                <div className="flex items-center text-gray-400">{nft.items}</div>
               </div>
-
-              {/* Sort */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sort By
-                </label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="newest">Newest</option>
-                  <option value="priceAsc">Price: Low to High</option>
-                  <option value="priceDesc">Price: High to Low</option>
-                  <option value="roiDesc">Highest ROI</option>
-                </select>
-              </div>
-
-              {/* Clear Filters */}
-              <div className="flex items-end">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setFilterStatus('all');
-                    setSortBy('newest');
-                  }}
-                  className="w-full px-4 py-2 text-primary-600 hover:bg-primary-50 rounded-lg transition"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-gray-600">
-            Showing <span className="font-bold">{filteredProperties.length}</span> of{' '}
-            <span className="font-bold">{demoProperties.length}</span> properties
-          </p>
-        </div>
-
-        {/* Property Grid */}
-        {filteredProperties.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
             ))}
           </div>
-        ) : (
-          <div className="text-center py-20 bg-white rounded-xl">
-            <p className="text-gray-500 text-lg">No properties found</p>
-            <p className="text-gray-400 mt-2">Try adjusting your filters</p>
-          </div>
-        )}
+        </div>
       </div>
+
     </div>
   );
 }

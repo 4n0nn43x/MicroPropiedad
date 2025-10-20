@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import QueryProvider from '@/components/providers/QueryProvider';
+import LayoutProvider from '@/components/providers/LayoutProvider';
 import '../globals.css';
 
 export default async function LocaleLayout({
@@ -14,19 +14,19 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
-          <Header />
-          <main className="min-h-screen pt-16">
-            {children}
-          </main>
-          <Footer />
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            <LayoutProvider>
+              {children}
+            </LayoutProvider>
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   );

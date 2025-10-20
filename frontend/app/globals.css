@@ -2,26 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @layer base {
+  * {
+    @apply border-dark-border;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-dark-bg text-white antialiased;
   }
 }
 
 @layer components {
+  .glass-card {
+    @apply bg-dark-card/50 backdrop-blur-xl border border-dark-border rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card hover:bg-dark-hover hover:border-primary-500/50 transition-all duration-300;
+  }
+
   .btn {
-    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white;
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white shadow-lg hover:shadow-glow;
   }
 
   .btn-secondary {
-    @apply bg-secondary-500 hover:bg-secondary-600 text-white;
+    @apply bg-gradient-to-r from-accent-purple to-accent-pink hover:from-accent-purple/90 hover:to-accent-pink/90 text-white shadow-lg;
   }
 
-  .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow;
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-400 hover:bg-primary-500/10;
+  }
+
+  .card-dark {
+    @apply bg-dark-card rounded-2xl border border-dark-border p-6;
+  }
+
+  .input-dark {
+    @apply bg-dark-card border border-dark-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition;
+  }
+
+  .glow-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-accent-purple;
   }
 }

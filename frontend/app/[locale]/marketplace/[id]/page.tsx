@@ -3,271 +3,375 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { MapPin, TrendingUp, Users, Building2, Calendar, FileText, Download, ChevronRight } from 'lucide-react';
-import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import Modal from '@/components/ui/Modal';
-import { demoProperties } from '@/lib/demoData';
+import Link from 'next/link';
+import {
+  MapPin,
+  TrendingUp,
+  Users,
+  Calendar,
+  FileText,
+  Download,
+  Share2,
+  Heart,
+  ChevronLeft,
+  ChevronRight,
+  DollarSign,
+  Percent,
+  Building2,
+  X,
+} from 'lucide-react';
+import { useProperty } from '@/lib/hooks/useProperties';
+import { useWallet } from '@/lib/hooks/useWallet';
+import { purchaseShares } from '@/lib/stacks/contracts';
 
 export default function PropertyDetailPage() {
   const params = useParams();
   const propertyId = params?.id as string;
-  const property = demoProperties.find(p => p.id === propertyId);
+  const locale = (params?.locale as string) || 'en';
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'documents' | 'activity'>('overview');
+  const { connected, address } = useWallet();
+  const { data: property, isLoading } = useProperty(propertyId);
+
+  const [activeTab, setActiveTab] = useState('overview');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [numShares, setNumShares] = useState(1);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // Mock images for carousel (in real app, these come from property data)
+  const images = [
+    'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
+    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
+    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
+    'https://images.unsplash.com/photo-1582407947304-fd86f028f716',
+  ];
+
+  const documents = [
+    { name: 'Property Title', type: 'PDF', size: '2.4 MB', url: '#' },
+    { name: 'Legal Structure', type: 'PDF', size: '1.8 MB', url: '#' },
+    { name: 'Financial Report', type: 'PDF', size: '3.2 MB', url: '#' },
+    { name: 'Inspection Report', type: 'PDF', size: '4.1 MB', url: '#' },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading property...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-gray-600">Property not found</p>
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+        <div className="text-center">
+          <Building2 size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Property not found</h2>
+          <Link href={`/${locale}/marketplace`} className="text-primary-400 hover:underline">
+            Return to marketplace
+          </Link>
+        </div>
       </div>
     );
   }
 
   const progressPercent = (property.soldShares / property.totalShares) * 100;
   const availableShares = property.totalShares - property.soldShares;
-  const totalCost = property.sharePrice * numShares;
-  const estimatedMonthlyReturn = (totalCost * (property.roi / 100)) / 12;
 
-  const statusVariant = {
-    'active': 'success' as const,
-    'sold-out': 'danger' as const,
-    'upcoming': 'info' as const,
-  }[property.status];
+  const handlePurchase = async () => {
+    if (!connected) {
+      alert('Please connect your wallet first');
+      return;
+    }
 
-  const statusLabel = {
-    'active': 'Active',
-    'sold-out': 'Sold Out',
-    'upcoming': 'Coming Soon',
-  }[property.status];
+    setIsPurchasing(true);
 
-  const tabs = [
-    { id: 'overview' as const, label: 'Overview', icon: Building2 },
-    { id: 'financials' as const, label: 'Financials', icon: TrendingUp },
-    { id: 'documents' as const, label: 'Documents', icon: FileText },
-    { id: 'activity' as const, label: 'Activity', icon: Users },
-  ];
+    try {
+      await purchaseShares(
+        `${property.contractAddress}.${property.contractName}`,
+        numShares,
+        property.sharePrice,
+        {
+          onFinish: (data) => {
+            alert(`Purchase successful! Transaction ID: ${data.txId}`);
+            setShowPurchaseModal(false);
+          },
+          onCancel: () => {
+            alert('Purchase cancelled');
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Purchase error:', error);
+      alert('Purchase failed. Please try again.');
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <a href="/en/marketplace" className="hover:text-primary-600">Marketplace</a>
-          <ChevronRight size={16} />
-          <span>{property.name}</span>
-        </div>
+    <div className="min-h-screen bg-dark-bg pb-20">
+      {/* Back Button */}
+      <div className="p-6 border-b border-dark-border">
+        <Link
+          href={`/${locale}/marketplace`}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition w-fit"
+        >
+          <ChevronLeft size={20} />
+          <span>Back to Marketplace</span>
+        </Link>
+      </div>
 
+      <div className="max-w-7xl mx-auto p-6">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {/* Hero Image */}
-            <div className="relative h-96 rounded-xl overflow-hidden mb-6">
-              <Image
-                src={property.image}
-                alt={property.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute top-4 left-4">
-                <Badge variant={statusVariant}>{statusLabel}</Badge>
-              </div>
-            </div>
+          {/* Left Column - Images & Details */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Image Carousel */}
+            <div className="relative rounded-2xl overflow-hidden bg-dark-card">
+              <div className="relative h-96">
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={property.name}
+                  fill
+                  className="object-cover"
+                />
 
-            {/* Title and Location */}
-            <div className="mb-6">
-              <h1 className="text-4xl font-bold mb-3">{property.name}</h1>
-              <div className="flex items-center text-gray-600 mb-4">
-                <MapPin className="w-5 h-5 mr-2" />
-                <span className="text-lg">{property.location}</span>
+                {/* Navigation Arrows */}
+                <button
+                  onClick={() => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-dark-card/80 backdrop-blur-xl flex items-center justify-center text-white hover:bg-dark-hover transition"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={() => setCurrentImageIndex((currentImageIndex + 1) % images.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-dark-card/80 backdrop-blur-xl flex items-center justify-center text-white hover:bg-dark-hover transition"
+                >
+                  <ChevronRight size={24} />
+                </button>
+
+                {/* Image Indicators */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition ${
+                        idx === currentImageIndex ? 'bg-white w-8' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Top Actions */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button className="w-10 h-10 rounded-full bg-dark-card/80 backdrop-blur-xl flex items-center justify-center text-white hover:bg-dark-hover transition">
+                    <Share2 size={18} />
+                  </button>
+                  <button className="w-10 h-10 rounded-full bg-dark-card/80 backdrop-blur-xl flex items-center justify-center text-white hover:bg-dark-hover transition">
+                    <Heart size={18} />
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Badge>{property.propertyType}</Badge>
-                <Badge variant="info">Built {property.yearBuilt}</Badge>
+
+              {/* Thumbnails */}
+              <div className="p-4 grid grid-cols-4 gap-2">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`relative h-20 rounded-lg overflow-hidden border-2 transition ${
+                      idx === currentImageIndex ? 'border-primary-500' : 'border-transparent'
+                    }`}
+                  >
+                    <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 mb-6">
-              <div className="flex gap-8">
-                {tabs.map(tab => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-                        flex items-center gap-2 pb-4 border-b-2 transition
-                        ${activeTab === tab.id
-                          ? 'border-primary-600 text-primary-600 font-semibold'
-                          : 'border-transparent text-gray-600 hover:text-primary-600'
-                        }
-                      `}
-                    >
-                      <Icon size={20} />
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-bold mb-3">Description</h2>
-                  <p className="text-gray-700 leading-relaxed">{property.description}</p>
-                </div>
-
-                <div>
-                  <h2 className="text-2xl font-bold mb-3">Key Features</h2>
-                  <ul className="grid md:grid-cols-2 gap-3">
-                    {property.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <div className="w-2 h-2 bg-primary-600 rounded-full mt-2 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'financials' && (
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-white p-6 rounded-xl shadow-md">
-                    <p className="text-gray-600 mb-2">Total Property Value</p>
-                    <p className="text-3xl font-bold text-primary-600">${property.totalValue.toLocaleString()}</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-md">
-                    <p className="text-gray-600 mb-2">Estimated Annual ROI</p>
-                    <p className="text-3xl font-bold text-success">{property.roi}%</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-md">
-                    <p className="text-gray-600 mb-2">Total Raised</p>
-                    <p className="text-3xl font-bold">${property.stats.totalRaised.toLocaleString()}</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-md">
-                    <p className="text-gray-600 mb-2">Total Investors</p>
-                    <p className="text-3xl font-bold">{property.stats.totalInvestors}</p>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                  <h3 className="text-xl font-bold mb-4">Revenue Distribution</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Last Payout</span>
-                      <span className="font-semibold">{property.stats.lastPayout}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Next Payout</span>
-                      <span className="font-semibold">{property.stats.nextPayout}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'documents' && (
-              <div className="space-y-4">
-                {property.documents.map((doc, index) => (
-                  <div key={index} className="bg-white p-6 rounded-xl shadow-md flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <FileText className="text-primary-600" size={32} />
-                      <div>
-                        <p className="font-semibold">{doc.title}</p>
-                        <p className="text-sm text-gray-600">PDF Document</p>
-                      </div>
-                    </div>
-                    <button className="text-primary-600 hover:text-primary-700">
-                      <Download size={24} />
-                    </button>
-                  </div>
+            <div className="glass-card">
+              {/* Tab Headers */}
+              <div className="flex border-b border-dark-border">
+                {['overview', 'financials', 'documents'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 px-6 py-4 font-medium capitalize transition ${
+                      activeTab === tab
+                        ? 'text-primary-400 border-b-2 border-primary-500'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {tab}
+                  </button>
                 ))}
               </div>
-            )}
 
-            {activeTab === 'activity' && (
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
-                <p className="text-gray-600">Activity feed coming soon...</p>
+              {/* Tab Content */}
+              <div className="p-6">
+                {activeTab === 'overview' && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-4">About this property</h3>
+                      <p className="text-gray-400 leading-relaxed">{property.description}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-4">Features</h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <div className="w-2 h-2 bg-accent-green rounded-full" />
+                          <span>Prime Location</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <div className="w-2 h-2 bg-accent-green rounded-full" />
+                          <span>High Occupancy Rate</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <div className="w-2 h-2 bg-accent-green rounded-full" />
+                          <span>Professional Management</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <div className="w-2 h-2 bg-accent-green rounded-full" />
+                          <span>Monthly Dividends</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'financials' && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-dark-bg p-4 rounded-xl">
+                        <p className="text-sm text-gray-500 mb-1">Property Value</p>
+                        <p className="text-2xl font-bold text-white">
+                          ${property.propertyValue.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-dark-bg p-4 rounded-xl">
+                        <p className="text-sm text-gray-500 mb-1">Annual ROI</p>
+                        <p className="text-2xl font-bold text-accent-green">{property.roi}%</p>
+                      </div>
+                      <div className="bg-dark-bg p-4 rounded-xl">
+                        <p className="text-sm text-gray-500 mb-1">Total Raised</p>
+                        <p className="text-2xl font-bold text-white">
+                          {(property.soldShares * property.sharePrice).toLocaleString()} STX
+                        </p>
+                      </div>
+                      <div className="bg-dark-bg p-4 rounded-xl">
+                        <p className="text-sm text-gray-500 mb-1">Next Payout</p>
+                        <p className="text-2xl font-bold text-white">
+                          {property.nextPayoutDate || 'TBD'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'documents' && (
+                  <div className="space-y-3">
+                    {documents.map((doc, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-4 bg-dark-bg rounded-xl hover:bg-dark-hover transition group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                            <FileText size={20} className="text-primary-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-white">{doc.name}</p>
+                            <p className="text-sm text-gray-500">
+                              {doc.type} • {doc.size}
+                            </p>
+                          </div>
+                        </div>
+                        <button className="opacity-0 group-hover:opacity-100 transition">
+                          <Download size={20} className="text-gray-400 hover:text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Right Column - Purchase Card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
-              {/* Purchase Card */}
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="mb-6">
-                  <p className="text-gray-600 mb-2">Share Price</p>
-                  <p className="text-4xl font-bold text-primary-600">${property.sharePrice}</p>
+            <div className="glass-card p-6 sticky top-6 space-y-6">
+              {/* Title & Location */}
+              <div>
+                <h1 className="text-3xl font-display font-bold text-white mb-3">{property.name}</h1>
+                <div className="flex items-center gap-2 text-gray-400">
+                  <MapPin size={16} />
+                  <span>{property.location}</span>
                 </div>
-
-                <div className="mb-6">
-                  <p className="text-gray-600 mb-2">Progress</p>
-                  <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                    <div
-                      className="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{property.soldShares.toLocaleString()} shares sold</span>
-                    <span className="font-bold text-primary-600">{progressPercent.toFixed(0)}%</span>
-                  </div>
-                </div>
-
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Available Shares</span>
-                    <span className="font-bold">{availableShares.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Minimum Purchase</span>
-                    <span className="font-bold">{property.minPurchase}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Est. ROI (Annual)</span>
-                    <span className="font-bold text-success">{property.roi}%</span>
-                  </div>
-                </div>
-
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setShowPurchaseModal(true)}
-                  disabled={property.status !== 'active'}
-                >
-                  {property.status === 'active' ? 'Purchase Shares' : 'Not Available'}
-                </Button>
               </div>
 
-              {/* Stats Card */}
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-bold mb-4">Property Stats</h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-gray-600 text-sm mb-1">Contract Address</p>
-                    <p className="text-xs font-mono bg-gray-50 p-2 rounded break-all">{property.contractAddress}</p>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Investors</span>
-                    <span className="font-bold">{property.stats.totalInvestors}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Raised</span>
-                    <span className="font-bold">${property.stats.totalRaised.toLocaleString()}</span>
-                  </div>
+              {/* Price */}
+              <div className="bg-dark-bg p-4 rounded-xl">
+                <p className="text-sm text-gray-500 mb-1">Share Price</p>
+                <p className="text-3xl font-bold text-white">{property.sharePrice} STX</p>
+                <p className="text-sm text-gray-500 mt-1">≈ ${(property.sharePrice * 0.5).toFixed(2)} USD</p>
+              </div>
+
+              {/* Progress */}
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-400">Funding Progress</span>
+                  <span className="font-bold text-white">{progressPercent.toFixed(1)}%</span>
                 </div>
+                <div className="w-full bg-dark-bg rounded-full h-3 overflow-hidden mb-2">
+                  <div
+                    className="bg-gradient-to-r from-primary-500 via-accent-purple to-accent-pink h-3 rounded-full transition-all duration-500 shadow-glow"
+                    style={{ width: `${Math.min(progressPercent, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>{property.soldShares.toLocaleString()} sold</span>
+                  <span>{availableShares.toLocaleString()} available</span>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-dark-bg p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Percent size={14} className="text-primary-400" />
+                    <p className="text-xs text-gray-500">ROI</p>
+                  </div>
+                  <p className="font-bold text-white">{property.roi}%</p>
+                </div>
+                <div className="bg-dark-bg p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users size={14} className="text-accent-purple" />
+                    <p className="text-xs text-gray-500">Investors</p>
+                  </div>
+                  <p className="font-bold text-white">145</p>
+                </div>
+              </div>
+
+              {/* Purchase Button */}
+              <button
+                onClick={() => setShowPurchaseModal(true)}
+                disabled={availableShares === 0}
+                className="btn btn-primary w-full"
+              >
+                {availableShares === 0 ? 'Sold Out' : 'Purchase Shares'}
+              </button>
+
+              {/* Info */}
+              <div className="text-xs text-gray-500 space-y-2">
+                <p>• Minimum purchase: 1 share</p>
+                <p>• Monthly dividend distribution</p>
+                <p>• Secured by blockchain</p>
               </div>
             </div>
           </div>
@@ -275,63 +379,81 @@ export default function PropertyDetailPage() {
       </div>
 
       {/* Purchase Modal */}
-      <Modal
-        isOpen={showPurchaseModal}
-        onClose={() => setShowPurchaseModal(false)}
-        title="Purchase Shares"
-        maxWidth="md"
-      >
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of Shares
-            </label>
-            <input
-              type="number"
-              min={property.minPurchase}
-              max={availableShares}
-              value={numShares}
-              onChange={(e) => setNumShares(parseInt(e.target.value) || property.minPurchase)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-            />
-            <p className="text-sm text-gray-600 mt-1">
-              Min: {property.minPurchase} | Max: {availableShares} available
-            </p>
-          </div>
+      {showPurchaseModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card max-w-md w-full p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white">Purchase Shares</h3>
+              <button
+                onClick={() => setShowPurchaseModal(false)}
+                className="text-gray-400 hover:text-white transition"
+              >
+                <X size={24} />
+              </button>
+            </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Share Price</span>
-              <span className="font-bold">${property.sharePrice}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Shares</span>
-              <span className="font-bold">{numShares}</span>
-            </div>
-            <div className="border-t pt-3 flex justify-between">
-              <span className="text-gray-900 font-semibold">Total Cost</span>
-              <span className="text-2xl font-bold text-primary-600">${totalCost.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Est. Monthly Return</span>
-              <span className="font-semibold text-success">${estimatedMonthlyReturn.toFixed(2)}</span>
+            {/* Content */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Number of Shares
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={availableShares}
+                  value={numShares}
+                  onChange={(e) => setNumShares(parseInt(e.target.value) || 1)}
+                  className="input-dark w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Available: {availableShares.toLocaleString()} shares
+                </p>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-dark-bg p-4 rounded-xl space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Share Price</span>
+                  <span className="text-white font-medium">{property.sharePrice} STX</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Quantity</span>
+                  <span className="text-white font-medium">{numShares}</span>
+                </div>
+                <div className="border-t border-dark-border pt-3 flex justify-between">
+                  <span className="text-white font-bold">Total Cost</span>
+                  <span className="text-white font-bold">{(property.sharePrice * numShares).toFixed(2)} STX</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Est. Monthly Return</span>
+                  <span className="text-accent-green">
+                    {((property.sharePrice * numShares * property.roi) / 100 / 12).toFixed(2)} STX
+                  </span>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowPurchaseModal(false)}
+                  className="btn btn-outline flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePurchase}
+                  disabled={isPurchasing || !connected}
+                  className="btn btn-primary flex-1"
+                >
+                  {isPurchasing ? 'Processing...' : connected ? 'Confirm Purchase' : 'Connect Wallet'}
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className="flex gap-4">
-            <Button variant="outline" className="flex-1" onClick={() => setShowPurchaseModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" className="flex-1">
-              Confirm Purchase
-            </Button>
-          </div>
-
-          <p className="text-xs text-gray-500 text-center">
-            By purchasing, you agree to our Terms of Service and understand the risks involved in real estate investment.
-          </p>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

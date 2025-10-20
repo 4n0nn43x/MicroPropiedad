@@ -1,17 +1,16 @@
 'use client';
 
-import Hero from '@/components/landing/Hero';
-import Features from '@/components/landing/Features';
-import HowItWorks from '@/components/landing/HowItWorks';
-import FAQ from '@/components/landing/FAQ';
+import { useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 
 export default function LandingPage() {
-  return (
-    <main>
-      <Hero />
-      <Features />
-      <HowItWorks />
-      <FAQ />
-    </main>
-  );
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+
+  useEffect(() => {
+    router.replace(`/${locale}/marketplace`);
+  }, [router, locale]);
+
+  return null;
 }
