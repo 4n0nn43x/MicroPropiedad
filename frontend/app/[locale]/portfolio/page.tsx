@@ -20,6 +20,21 @@ export default function PortfolioPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [claimingPropertyId, setClaimingPropertyId] = useState<string | null>(null);
 
+  // Log portfolio data when loaded
+  if (portfolio && !isLoading && connected) {
+    console.log('\n💼 PORTFOLIO PAGE - User holdings loaded');
+    console.log('👤 Wallet address:', address);
+    console.log('📊 Total investments:', portfolio.length);
+    portfolio.forEach((inv, idx) => {
+      console.log(`  [${idx + 1}] ${inv.name}:`, {
+        shares: inv.sharesOwned,
+        invested: inv.invested.toFixed(2) + ' STX',
+        currentValue: inv.currentValue.toFixed(2) + ' STX',
+        claimable: inv.claimableAmount?.toFixed(4) + ' STX' || '0 STX',
+      });
+    });
+  }
+
   // Calculate stats from real blockchain data
   const stats = portfolio && portfolio.length > 0 ? {
     totalInvested: portfolio.reduce((sum, inv) => sum + inv.invested, 0),
@@ -41,6 +56,20 @@ export default function PortfolioPage() {
     totalShares: 0,
     claimableTotal: 0,
   };
+
+  // Log calculated stats
+  if (portfolio && portfolio.length > 0) {
+    console.log('📈 Portfolio stats calculated:', {
+      totalInvested: stats.totalInvested.toFixed(2) + ' STX',
+      currentValue: stats.currentValue.toFixed(2) + ' STX',
+      totalReturns: stats.totalReturns.toFixed(2) + ' STX',
+      returnPercentage: stats.returnPercentage.toFixed(2) + '%',
+      propertiesOwned: stats.propertiesOwned,
+      totalShares: stats.totalShares,
+      claimableTotal: stats.claimableTotal.toFixed(4) + ' STX',
+    });
+    console.log('✅ Portfolio page ready to render\n');
+  }
 
   const handleClaimPayout = async (investment: any) => {
     if (!connected || !address) {

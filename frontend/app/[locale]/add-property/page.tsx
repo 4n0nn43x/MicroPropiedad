@@ -51,7 +51,19 @@ export default function AddPropertyPage() {
   ];
 
   const handleInputChange = (field: string, value: string | string[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const updated = { ...formData, [field]: value };
+
+    // Auto-calculate price per share when totalValue or totalShares changes
+    if (field === 'totalValue' || field === 'totalShares') {
+      const totalVal = Number(field === 'totalValue' ? value : formData.totalValue);
+      const shares = Number(field === 'totalShares' ? value : formData.totalShares);
+
+      if (totalVal > 0 && shares > 0) {
+        updated.pricePerShare = (totalVal / shares).toFixed(2);
+      }
+    }
+
+    setFormData(updated);
   };
 
   const nextStep = () => {
@@ -325,18 +337,17 @@ export default function AddPropertyPage() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {t('step2.pricePerShare')} *
+                  {t('step2.pricePerShare')} (Auto-calculated)
                 </label>
-                <input
-                  type="number"
-                  value={formData.pricePerShare}
-                  onChange={(e) => handleInputChange('pricePerShare', e.target.value)}
-                  placeholder={t('step2.pricePerSharePlaceholder')}
-                  className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
-                />
+                <div className="w-full px-4 py-3 bg-dark-card/50 border border-dark-border rounded-xl text-white flex items-center justify-between">
+                  <span className="text-2xl font-bold text-primary-400">
+                    ${formData.pricePerShare || '0'}
+                  </span>
+                  <span className="text-xs text-gray-500">per share</span>
+                </div>
                 {formData.totalValue && formData.totalShares && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    {t('step2.calculatedPrice', { amount: (Number(formData.totalValue) / Number(formData.totalShares)).toFixed(2) })}
+                  <p className="mt-2 text-xs text-accent-green">
+                    ✓ {t('step2.calculatedPrice', { amount: (Number(formData.totalValue) / Number(formData.totalShares)).toFixed(2) })}
                   </p>
                 )}
               </div>

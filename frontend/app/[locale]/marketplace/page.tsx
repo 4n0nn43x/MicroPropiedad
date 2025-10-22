@@ -17,6 +17,15 @@ export default function MarketplacePage() {
   // Fetch properties from smart contracts
   const { data: contractProperties, isLoading } = useProperties();
 
+  // Log properties when loaded
+  if (contractProperties && !isLoading) {
+    console.log('\n🏪 MARKETPLACE PAGE - Properties loaded');
+    console.log('📊 Total properties:', contractProperties.length);
+    contractProperties.forEach((prop, idx) => {
+      console.log(`  [${idx + 1}] ${prop.name} - ${prop.location} (${prop.images?.length || 1} images, ${prop.documents?.length || 0} docs)`);
+    });
+  }
+
   const categories = [
     { id: 'all', label: 'All Properties' },
     { id: 'residential', label: 'Residential' },
@@ -39,6 +48,12 @@ export default function MarketplacePage() {
     roi: prop.roi,
     verified: prop.status === 'active',
   })) : [];
+
+  // Log display properties
+  if (displayProperties.length > 0) {
+    console.log('🎨 Display properties prepared:', displayProperties.length);
+    console.log('✅ Marketplace ready to render\n');
+  }
 
   // Calculate top performing properties from blockchain data
   const topProperties = displayProperties

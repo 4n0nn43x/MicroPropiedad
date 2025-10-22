@@ -40,12 +40,66 @@ export default function PropertyDetailPage() {
   const [numShares, setNumShares] = useState(1);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
-  // Use property image from blockchain (will use single image until multiple images supported)
-  const images = property ? [property.imageUrl] : [];
+  // Log property data when loaded
+  if (property && !isLoading) {
+    console.log('\n🏠 PROPERTY DETAIL PAGE - Data loaded for property #' + propertyId);
+    console.log('📊 Property overview:', {
+      id: property.id,
+      name: property.name,
+      location: property.location,
+      propertyType: property.propertyType || '❌ not set',
+      status: property.status,
+      contractAddress: property.contractAddress,
+      contractName: property.contractName,
+    });
+    console.log('💰 Financial info:', {
+      sharePrice: property.sharePrice,
+      totalShares: property.totalShares,
+      soldShares: property.soldShares,
+      propertyValue: property.propertyValue,
+      roi: property.roi,
+    });
+    console.log('🖼️ Media & content:', {
+      mainImageUrl: property.imageUrl,
+      hasImagesArray: !!property.images,
+      imagesArrayLength: property.images?.length || 0,
+      allImages: property.images,
+      description: property.description?.substring(0, 100) + '...',
+    });
+    console.log('📋 Property details:', {
+      hasDetails: !!property.details,
+      details: property.details,
+    });
+    console.log('📄 Documents:', {
+      hasDocuments: !!property.documents,
+      documentCount: property.documents?.length || 0,
+      documents: property.documents,
+    });
+    console.log('🌐 IPFS:', {
+      metadataUri: property.metadataUri || '❌ no metadata URI',
+    });
+  }
 
-  // Documents will be stored on IPFS/Arweave in production
-  // For now, this is a placeholder for the documents tab
-  const documents: Array<{ name: string; type: string; size: string; url: string }> = [];
+  // Use all images from IPFS metadata, fallback to single imageUrl
+  const images = property ? (property.images && property.images.length > 0 ? property.images : [property.imageUrl]) : [];
+
+  // Load documents from IPFS metadata
+  const documents: Array<{ name: string; type: string; size: string; url: string }> = property?.documents?.map((url, idx) => ({
+    name: `Document ${idx + 1}`,
+    type: 'PDF',
+    size: 'N/A',
+    url
+  })) || [];
+
+  // Log what will be displayed
+  if (property && !isLoading) {
+    console.log('🎨 Display data:', {
+      imagesToShow: images.length,
+      documentsToShow: documents.length,
+      currentImageIndex,
+    });
+    console.log('✅ Property detail page ready to render\n');
+  }
 
   if (isLoading) {
     return (
@@ -130,6 +184,8 @@ export default function PropertyDetailPage() {
                   src={images[currentImageIndex]}
                   alt={property.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 800px"
+                  priority={currentImageIndex === 0}
                   className="object-cover"
                 />
 
@@ -181,7 +237,13 @@ export default function PropertyDetailPage() {
                       idx === currentImageIndex ? 'border-primary-500' : 'border-transparent'
                     }`}
                   >
-                    <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                    <Image
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 25vw, 150px"
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -214,6 +276,39 @@ export default function PropertyDetailPage() {
                       <h3 className="text-xl font-bold text-white mb-4">{t('overview.aboutTitle')}</h3>
                       <p className="text-gray-400 leading-relaxed">{property.description}</p>
                     </div>
+
+                    {/* Property Details */}
+                    {property.details && (
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4">Property Details</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {property.details.bedrooms && (
+                            <div className="flex justify-between p-4 bg-dark-card rounded-xl">
+                              <span className="text-gray-400">Bedrooms</span>
+                              <span className="text-white font-semibold">{property.details.bedrooms}</span>
+                            </div>
+                          )}
+                          {property.details.bathrooms && (
+                            <div className="flex justify-between p-4 bg-dark-card rounded-xl">
+                              <span className="text-gray-400">Bathrooms</span>
+                              <span className="text-white font-semibold">{property.details.bathrooms}</span>
+                            </div>
+                          )}
+                          {property.details.squareFeet && (
+                            <div className="flex justify-between p-4 bg-dark-card rounded-xl">
+                              <span className="text-gray-400">Square Feet</span>
+                              <span className="text-white font-semibold">{property.details.squareFeet.toLocaleString()} sq ft</span>
+                            </div>
+                          )}
+                          {property.details.yearBuilt && (
+                            <div className="flex justify-between p-4 bg-dark-card rounded-xl">
+                              <span className="text-gray-400">Year Built</span>
+                              <span className="text-white font-semibold">{property.details.yearBuilt}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <h3 className="text-xl font-bold text-white mb-4">{t('overview.featuresTitle')}</h3>

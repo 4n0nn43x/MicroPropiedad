@@ -36,10 +36,25 @@ export default function MyPropertiesPage() {
     );
   }
 
-  // Filter properties owned by current user (where they are the deployer)
+  // Filter properties owned by current user (registered by their wallet)
   const myProperties = allProperties?.filter(prop =>
-    prop.contractAddress.toLowerCase() === address?.toLowerCase()
+    prop.owner.toLowerCase() === address?.toLowerCase()
   ) || [];
+
+  // Log for debugging
+  if (allProperties && address) {
+    console.log('\n🏢 MY PROPERTIES PAGE');
+    console.log('👤 Current wallet address:', address);
+    console.log('📊 Total properties in system:', allProperties.length);
+    console.log('🏘️ Properties owned by me:', myProperties.length);
+    allProperties.forEach((prop, idx) => {
+      const isOwned = prop.owner.toLowerCase() === address.toLowerCase();
+      console.log(`  [${idx + 1}] ${prop.name}`, {
+        owner: prop.owner,
+        isOwnedByMe: isOwned ? '✅ YES' : '❌ NO',
+      });
+    });
+  }
 
   // Calculate stats from blockchain data
   const stats = {

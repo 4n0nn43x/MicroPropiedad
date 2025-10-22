@@ -38,6 +38,30 @@ export default function ProfilePage() {
     // Add save logic here
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData({ ...profileData, avatar: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Wallet connection guard
   if (!connected) {
     return (
@@ -101,9 +125,19 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <button className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition">
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center hover:bg-primary-600 transition cursor-pointer"
+                >
                   <Camera size={16} className="text-white" />
-                </button>
+                </label>
               </div>
               <div>
                 <p className="text-white font-medium mb-1">{t('general.profilePicture.uploadNew')}</p>
