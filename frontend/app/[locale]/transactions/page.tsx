@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { ArrowUpRight, ArrowDownRight, ExternalLink, Filter, Search, Wallet } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
 
 export default function TransactionsPage() {
+  const t = useTranslations('transactions');
   const { connected, connect } = useWallet();
   const [filterType, setFilterType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,13 +17,13 @@ export default function TransactionsPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-6">You need to connect your wallet to view your transactions</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('wallet.connectTitle')}</h2>
+          <p className="text-gray-400 mb-6">{t('wallet.connectDescription')}</p>
           <button
             onClick={connect}
             className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Connect Wallet
+            {t('wallet.connectButton')}
           </button>
         </div>
       </div>
@@ -55,11 +57,11 @@ export default function TransactionsPage() {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'purchase':
-        return 'Purchase';
+        return t('types.purchase');
       case 'sale':
-        return 'Sale';
+        return t('types.sale');
       case 'payout':
-        return 'Payout';
+        return t('types.payout');
       default:
         return type;
     }
@@ -95,29 +97,29 @@ export default function TransactionsPage() {
     <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Transaction History</h1>
-        <p className="text-gray-400">View all your property transactions on the blockchain</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('header.title')}</h1>
+        <p className="text-gray-400">{t('header.description')}</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-6">
         <div className="glass-card p-6">
-          <p className="text-sm text-gray-400 mb-2">Total Transactions</p>
+          <p className="text-sm text-gray-400 mb-2">{t('stats.totalTransactions')}</p>
           <p className="text-3xl font-bold text-white">{stats.totalTransactions}</p>
         </div>
 
         <div className="glass-card p-6">
-          <p className="text-sm text-gray-400 mb-2">Total Purchased</p>
+          <p className="text-sm text-gray-400 mb-2">{t('stats.totalPurchased')}</p>
           <p className="text-3xl font-bold text-white">${stats.totalPurchased.toLocaleString()}</p>
         </div>
 
         <div className="glass-card p-6">
-          <p className="text-sm text-gray-400 mb-2">Total Sold</p>
+          <p className="text-sm text-gray-400 mb-2">{t('stats.totalSold')}</p>
           <p className="text-3xl font-bold text-accent-green">${stats.totalSold.toLocaleString()}</p>
         </div>
 
         <div className="glass-card p-6">
-          <p className="text-sm text-gray-400 mb-2">Total Payouts</p>
+          <p className="text-sm text-gray-400 mb-2">{t('stats.totalPayouts')}</p>
           <p className="text-3xl font-bold text-accent-purple">${stats.totalPayouts.toLocaleString()}</p>
         </div>
       </div>
@@ -129,7 +131,7 @@ export default function TransactionsPage() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Search by property name or transaction hash..."
+            placeholder={t('filters.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
@@ -139,10 +141,10 @@ export default function TransactionsPage() {
         {/* Type Filter */}
         <div className="flex gap-2">
           {[
-            { value: 'all', label: 'All' },
-            { value: 'purchase', label: 'Purchase' },
-            { value: 'sale', label: 'Sale' },
-            { value: 'payout', label: 'Payout' },
+            { value: 'all', label: t('filters.all') },
+            { value: 'purchase', label: t('filters.purchase') },
+            { value: 'sale', label: t('filters.sale') },
+            { value: 'payout', label: t('filters.payout') },
           ].map((filter) => (
             <button
               key={filter.value}
@@ -163,12 +165,12 @@ export default function TransactionsPage() {
       <div className="glass-card overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-dark-border bg-dark-card/30">
-          <div className="text-sm font-medium text-gray-400">Type</div>
-          <div className="col-span-2 text-sm font-medium text-gray-400">Property</div>
-          <div className="text-sm font-medium text-gray-400">Shares</div>
-          <div className="text-sm font-medium text-gray-400">Amount</div>
-          <div className="text-sm font-medium text-gray-400">Date</div>
-          <div className="text-sm font-medium text-gray-400">Transaction</div>
+          <div className="text-sm font-medium text-gray-400">{t('table.type')}</div>
+          <div className="col-span-2 text-sm font-medium text-gray-400">{t('table.property')}</div>
+          <div className="text-sm font-medium text-gray-400">{t('table.shares')}</div>
+          <div className="text-sm font-medium text-gray-400">{t('table.amount')}</div>
+          <div className="text-sm font-medium text-gray-400">{t('table.date')}</div>
+          <div className="text-sm font-medium text-gray-400">{t('table.transaction')}</div>
         </div>
 
         {/* Table Body */}
@@ -222,16 +224,15 @@ export default function TransactionsPage() {
         {filteredTransactions.length === 0 && (
           <div className="px-6 py-12 text-center">
             <ArrowUpRight size={48} className="mx-auto mb-4 text-gray-600" />
-            <h3 className="text-xl font-bold text-white mb-2">Transaction History Coming Soon</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('empty.title')}</h3>
             <p className="text-gray-400 mb-6">
-              Transaction indexing requires backend service.<br />
-              For now, view your transactions on Stacks Explorer.
+              {t('empty.description')}
             </p>
             <button
               onClick={() => window.open('https://explorer.hiro.so/?chain=testnet', '_blank')}
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
             >
-              Open Stacks Explorer
+              {t('empty.explorerButton')}
               <ExternalLink size={18} />
             </button>
           </div>

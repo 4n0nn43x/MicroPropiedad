@@ -8,12 +8,14 @@ import { TrendingUp, TrendingDown, DollarSign, Percent, Calendar, Wallet } from 
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useUserPortfolio } from '@/lib/hooks/useProperties';
 import { claimPayout } from '@/lib/stacks/contracts';
+import { useTranslations } from 'next-intl';
 
 export default function PortfolioPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const { connected, address, connect } = useWallet();
   const { data: portfolio, isLoading } = useUserPortfolio(address || undefined);
+  const t = useTranslations('portfolio');
 
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [claimingPropertyId, setClaimingPropertyId] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export default function PortfolioPage() {
 
   const handleClaimPayout = async (investment: any) => {
     if (!connected || !address) {
-      alert('Please connect your wallet first');
+      alert(t('alerts.connectWallet'));
       return;
     }
 
@@ -55,11 +57,12 @@ export default function PortfolioPage() {
         {
           onFinish: (data) => {
             console.log('Payout claimed! Transaction:', data.txId);
-            alert(`Payout claimed successfully! Transaction ID: ${data.txId}\n\nAmount: ${investment.claimableAmount.toFixed(4)} STX`);
+            alert(t('alerts.payoutClaimed', { txId: data.txId, amount: investment.claimableAmount.toFixed(4) }));
             setClaimingPropertyId(null);
           },
           onCancel: () => {
             console.log('Claim cancelled');
+            alert(t('alerts.claimCancelled'));
             setClaimingPropertyId(null);
           }
         }
@@ -67,7 +70,7 @@ export default function PortfolioPage() {
     } catch (error) {
       console.error('Error claiming payout:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to claim payout';
-      alert(`Error: ${errorMessage}`);
+      alert(t('alerts.claimError', { message: errorMessage }));
       setClaimingPropertyId(null);
     }
   };
@@ -78,13 +81,13 @@ export default function PortfolioPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-6">Connect your wallet to view your portfolio</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('wallet.connectTitle')}</h2>
+          <p className="text-gray-400 mb-6">{t('wallet.connectDescription')}</p>
           <button
             onClick={connect}
             className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Connect Wallet
+            {t('wallet.connectButton')}
           </button>
         </div>
       </div>
@@ -97,7 +100,7 @@ export default function PortfolioPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading your portfolio from blockchain...</p>
+          <p className="text-gray-400">{t('loading.message')}</p>
         </div>
       </div>
     );
@@ -107,8 +110,8 @@ export default function PortfolioPage() {
     <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">My Portfolio</h1>
-        <p className="text-gray-400">Track your real estate investments and returns</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('header.title')}</h1>
+        <p className="text-gray-400">{t('header.description')}</p>
       </div>
 
       {/* Claimable Payouts Alert */}
@@ -116,12 +119,12 @@ export default function PortfolioPage() {
         <div className="glass-card p-6 bg-accent-green/10 border border-accent-green/30">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1">Claimable Payouts Available!</h3>
-              <p className="text-gray-400">You have unclaimed revenue distributions</p>
+              <h3 className="text-lg font-bold text-white mb-1">{t('claimable.title')}</h3>
+              <p className="text-gray-400">{t('claimable.description')}</p>
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold text-accent-green">{stats.claimableTotal.toFixed(4)} STX</p>
-              <p className="text-sm text-gray-500">≈ ${(stats.claimableTotal * 0.5).toFixed(2)} USD</p>
+              <p className="text-sm text-gray-500">{t('claimable.usdApprox', { amount: (stats.claimableTotal * 0.5).toFixed(2) })}</p>
             </div>
           </div>
         </div>
@@ -131,7 +134,7 @@ export default function PortfolioPage() {
       <div className="grid grid-cols-4 gap-6">
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Invested</p>
+            <p className="text-sm text-gray-400">{t('stats.totalInvested')}</p>
             <div className="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center">
               <DollarSign size={20} className="text-primary-400" />
             </div>
@@ -139,12 +142,12 @@ export default function PortfolioPage() {
           <p className="text-3xl font-bold text-white mb-1">
             ${stats.totalInvested.toLocaleString()}
           </p>
-          <p className="text-xs text-gray-500">{stats.propertiesOwned} properties</p>
+          <p className="text-xs text-gray-500">{stats.propertiesOwned} {t('stats.properties')}</p>
         </div>
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Current Value</p>
+            <p className="text-sm text-gray-400">{t('stats.currentValue')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-green/10 flex items-center justify-center">
               <TrendingUp size={20} className="text-accent-green" />
             </div>
@@ -152,12 +155,12 @@ export default function PortfolioPage() {
           <p className="text-3xl font-bold text-white mb-1">
             ${stats.currentValue.toLocaleString()}
           </p>
-          <p className="text-xs text-accent-green">+${stats.totalReturns.toLocaleString()} total</p>
+          <p className="text-xs text-accent-green">+${stats.totalReturns.toLocaleString()} {t('stats.total')}</p>
         </div>
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Returns</p>
+            <p className="text-sm text-gray-400">{t('stats.totalReturns')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-purple/10 flex items-center justify-center">
               <Percent size={20} className="text-accent-purple" />
             </div>
@@ -165,12 +168,12 @@ export default function PortfolioPage() {
           <p className="text-3xl font-bold text-white mb-1">
             {stats.returnPercentage}%
           </p>
-          <p className="text-xs text-gray-500">Average ROI</p>
+          <p className="text-xs text-gray-500">{t('stats.averageRoi')}</p>
         </div>
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Shares</p>
+            <p className="text-sm text-gray-400">{t('stats.totalShares')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-pink/10 flex items-center justify-center">
               <Calendar size={20} className="text-accent-pink" />
             </div>
@@ -178,15 +181,15 @@ export default function PortfolioPage() {
           <p className="text-3xl font-bold text-white mb-1">
             {stats.totalShares}
           </p>
-          <p className="text-xs text-gray-500">Across all properties</p>
+          <p className="text-xs text-gray-500">{t('stats.acrossAll')}</p>
         </div>
       </div>
 
       {/* Period Filter */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">My Investments</h2>
+        <h2 className="text-2xl font-bold text-white">{t('investments.title')}</h2>
         <div className="flex gap-2">
-          {['all', '1M', '3M', '6M', '1Y'].map((period) => (
+          {(['all', '1M', '3M', '6M', '1Y'] as const).map((period) => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
@@ -196,7 +199,7 @@ export default function PortfolioPage() {
                   : 'bg-dark-card text-gray-400 hover:text-white'
               }`}
             >
-              {period === 'all' ? 'All Time' : period}
+              {t(`investments.period.${period}`)}
             </button>
           ))}
         </div>
@@ -226,13 +229,13 @@ export default function PortfolioPage() {
                     <p className="text-sm text-gray-400">{investment.location}</p>
                   </div>
                   <span className="px-3 py-1 bg-accent-green/10 text-accent-green text-xs font-medium rounded-full">
-                    Active
+                    {t('investments.status.active')}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-5 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Shares Owned</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('investments.sharesOwned')}</p>
                     <p className="text-sm font-bold text-white">
                       {investment.sharesOwned} / {investment.totalShares}
                     </p>
@@ -242,28 +245,28 @@ export default function PortfolioPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Invested</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('investments.invested')}</p>
                     <p className="text-sm font-bold text-white">
                       {investment.invested.toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Current Value</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('investments.currentValue')}</p>
                     <p className="text-sm font-bold text-white">
                       {investment.currentValue.toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Returns</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('investments.returns')}</p>
                     <p className="text-sm font-bold text-accent-green">
                       +{(investment.currentValue - investment.invested).toFixed(2)} STX ({(((investment.currentValue - investment.invested) / investment.invested) * 100).toFixed(1)}%)
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Claimable Payout</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('investments.claimablePayout')}</p>
                     {investment.claimableAmount > 0 ? (
                       <>
                         <p className="text-sm font-bold text-accent-green">
@@ -272,7 +275,7 @@ export default function PortfolioPage() {
                         <p className="text-xs text-accent-green">Round #{investment.currentRound}</p>
                       </>
                     ) : (
-                      <p className="text-sm text-gray-600">No pending payouts</p>
+                      <p className="text-sm text-gray-600">{t('investments.noPending')}</p>
                     )}
                   </div>
                 </div>
@@ -282,7 +285,7 @@ export default function PortfolioPage() {
                     href={`/${locale}/marketplace/${investment.id}`}
                     className="px-4 py-2 bg-dark-card hover:bg-dark-hover text-white rounded-lg text-sm font-medium transition"
                   >
-                    View Details
+                    {t('investments.viewDetails')}
                   </Link>
                   {investment.claimableAmount > 0 && (
                     <button
@@ -294,14 +297,14 @@ export default function PortfolioPage() {
                           : 'bg-accent-green hover:bg-accent-green/90 text-white'
                       }`}
                     >
-                      {claimingPropertyId === investment.id ? 'Claiming...' : `Claim ${investment.claimableAmount.toFixed(4)} STX`}
+                      {claimingPropertyId === investment.id ? t('investments.claiming') : t('investments.claimButton', { amount: investment.claimableAmount.toFixed(4) })}
                     </button>
                   )}
                   <button
                     className="px-4 py-2 bg-dark-card hover:bg-dark-hover text-white rounded-lg text-sm font-medium transition"
                     title="Coming soon"
                   >
-                    Transfer Shares
+                    {t('investments.transferShares')}
                   </button>
                 </div>
               </div>
@@ -312,13 +315,13 @@ export default function PortfolioPage() {
       ) : (
         <div className="glass-card p-12 text-center">
           <TrendingUp size={64} className="mx-auto mb-4 text-gray-600" />
-          <h3 className="text-xl font-bold text-white mb-2">No Investments Yet</h3>
-          <p className="text-gray-400 mb-6">Start building your real estate portfolio today</p>
+          <h3 className="text-xl font-bold text-white mb-2">{t('empty.title')}</h3>
+          <p className="text-gray-400 mb-6">{t('empty.description')}</p>
           <Link
             href={`/${locale}/marketplace`}
             className="inline-block px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Explore Properties
+            {t('empty.exploreButton')}
           </Link>
         </div>
       )}

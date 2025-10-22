@@ -1,4 +1,31 @@
 {
+  "navigation": {
+    "tagline": "Tokenización de Bienes Raíces",
+    "marketplace": {
+      "name": "Mercado",
+      "description": "Explorar propiedades"
+    },
+    "portfolio": {
+      "name": "Mi Portafolio",
+      "description": "Tus inversiones"
+    },
+    "properties": {
+      "name": "Mis Propiedades",
+      "description": "Propiedades que posees"
+    },
+    "addProperty": {
+      "name": "Agregar Propiedad",
+      "description": "Listar nueva propiedad"
+    },
+    "transactions": {
+      "name": "Transacciones",
+      "description": "Historial de transacciones"
+    },
+    "profile": {
+      "name": "Perfil",
+      "description": "Configuración de cuenta"
+    }
+  },
   "common": {
     "buttons": {
       "connect": "Conectar Cartera",
@@ -135,9 +162,434 @@
       ]
     }
   },
+  "portfolio": {
+    "wallet": {
+      "connectTitle": "Conecta Tu Billetera",
+      "connectDescription": "Conecta tu billetera para ver tu portafolio",
+      "connectButton": "Conectar Billetera"
+    },
+    "loading": {
+      "message": "Cargando tu portafolio desde la blockchain..."
+    },
+    "header": {
+      "title": "Mi Portafolio",
+      "description": "Rastrea tus inversiones inmobiliarias y rendimientos"
+    },
+    "claimable": {
+      "title": "¡Pagos Reclamables Disponibles!",
+      "description": "Tienes distribuciones de ingresos sin reclamar",
+      "usdApprox": "≈ ${amount} USD"
+    },
+    "stats": {
+      "totalInvested": "Total Invertido",
+      "properties": "propiedades",
+      "currentValue": "Valor Actual",
+      "total": "total",
+      "totalReturns": "Retornos Totales",
+      "averageRoi": "ROI Promedio",
+      "totalShares": "Acciones Totales",
+      "acrossAll": "En todas las propiedades"
+    },
+    "investments": {
+      "title": "Mis Inversiones",
+      "period": {
+        "all": "Todo el Tiempo",
+        "1M": "1M",
+        "3M": "3M",
+        "6M": "6M",
+        "1Y": "1A"
+      },
+      "status": {
+        "active": "Activo"
+      },
+      "sharesOwned": "Acciones Poseídas",
+      "invested": "Invertido",
+      "currentValue": "Valor Actual",
+      "returns": "Rendimientos",
+      "claimablePayout": "Pago Reclamable",
+      "noPending": "Sin pagos pendientes",
+      "viewDetails": "Ver Detalles",
+      "claiming": "Reclamando...",
+      "claimButton": "Reclamar {amount} STX",
+      "transferShares": "Transferir Acciones"
+    },
+    "empty": {
+      "title": "Sin Inversiones Aún",
+      "description": "Comienza a construir tu portafolio inmobiliario hoy",
+      "exploreButton": "Explorar Propiedades"
+    },
+    "alerts": {
+      "connectWallet": "Por favor conecta tu billetera primero",
+      "payoutClaimed": "¡Pago reclamado exitosamente! ID de Transacción: {txId}\n\nMonto: {amount} STX",
+      "claimCancelled": "Reclamo cancelado",
+      "claimError": "Error: {message}"
+    }
+  },
+  "properties": {
+    "wallet": {
+      "connectTitle": "Conecta Tu Billetera",
+      "connectDescription": "Necesitas conectar tu billetera para administrar tus propiedades",
+      "connectButton": "Conectar Billetera"
+    },
+    "loading": {
+      "message": "Cargando tus propiedades desde la blockchain..."
+    },
+    "header": {
+      "title": "Mis Propiedades",
+      "description": "Administra las propiedades que has listado en la plataforma",
+      "addButton": "+ Agregar Nueva Propiedad"
+    },
+    "stats": {
+      "totalProperties": "Propiedades Totales",
+      "totalValue": "Valor Total",
+      "totalRaised": "Total Recaudado",
+      "totalInvestors": "Inversores Totales"
+    },
+    "list": {
+      "title": "Todas las Propiedades",
+      "fundingProgress": "Progreso de Financiamiento",
+      "totalShares": "Acciones Totales",
+      "sharesSold": "Acciones Vendidas",
+      "pricePerShare": "Precio por Acción",
+      "totalRaised": "Total Recaudado",
+      "roi": "ROI",
+      "sharesSoldLabel": "acciones vendidas",
+      "available": "disponibles"
+    },
+    "status": {
+      "active": "Activo",
+      "soldOut": "Agotado",
+      "pending": "Pendiente"
+    },
+    "menu": {
+      "view": "Ver",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "empty": {
+      "title": "Sin Propiedades Listadas Aún",
+      "description": "Comienza a tokenizar tus bienes raíces y recauda capital en la blockchain",
+      "addButton": "+ Agrega Tu Primera Propiedad"
+    }
+  },
+  "transactions": {
+    "wallet": {
+      "connectTitle": "Conecta Tu Billetera",
+      "connectDescription": "Necesitas conectar tu billetera para ver tus transacciones",
+      "connectButton": "Conectar Billetera"
+    },
+    "header": {
+      "title": "Historial de Transacciones",
+      "description": "Ve todas tus transacciones de propiedades en la blockchain"
+    },
+    "stats": {
+      "totalTransactions": "Transacciones Totales",
+      "totalPurchased": "Total Comprado",
+      "totalSold": "Total Vendido",
+      "totalPayouts": "Pagos Totales"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre de propiedad o hash de transacción...",
+      "all": "Todas",
+      "purchase": "Compra",
+      "sale": "Venta",
+      "payout": "Pago"
+    },
+    "table": {
+      "type": "Tipo",
+      "property": "Propiedad",
+      "shares": "Acciones",
+      "amount": "Monto",
+      "date": "Fecha",
+      "transaction": "Transacción"
+    },
+    "types": {
+      "purchase": "Compra",
+      "sale": "Venta",
+      "payout": "Pago"
+    },
+    "empty": {
+      "title": "Historial de Transacciones Próximamente",
+      "description": "La indexación de transacciones requiere servicio backend.\nPor ahora, ve tus transacciones en Stacks Explorer.",
+      "explorerButton": "Abrir Stacks Explorer"
+    }
+  },
+  "profile": {
+    "wallet": {
+      "connectTitle": "Conecta Tu Billetera",
+      "connectDescription": "Necesitas conectar tu billetera para acceder a tu perfil",
+      "connectButton": "Conectar Billetera"
+    },
+    "header": {
+      "title": "Configuración de Cuenta",
+      "description": "Administra tu perfil y preferencias"
+    },
+    "tabs": {
+      "general": "General",
+      "notifications": "Notificaciones",
+      "wallet": "Billetera"
+    },
+    "general": {
+      "profilePicture": {
+        "title": "Foto de Perfil",
+        "uploadNew": "Subir nueva foto",
+        "fileTypes": "JPG, PNG máx. 5MB"
+      },
+      "personalInfo": {
+        "title": "Información Personal",
+        "fullName": "Nombre Completo",
+        "email": "Dirección de Email",
+        "phone": "Número de Teléfono",
+        "location": "Ubicación",
+        "bio": "Biografía"
+      },
+      "saveButton": "Guardar Cambios"
+    },
+    "notifications": {
+      "title": "Preferencias de Notificaciones",
+      "emailNotifications": {
+        "label": "Notificaciones por Email",
+        "description": "Recibe actualizaciones por email sobre tu cuenta"
+      },
+      "newProperties": {
+        "label": "Nuevas Propiedades",
+        "description": "Recibe notificaciones cuando se listen nuevas propiedades"
+      },
+      "priceChanges": {
+        "label": "Cambios de Precio",
+        "description": "Alertas cuando los precios de propiedades cambien"
+      },
+      "payouts": {
+        "label": "Notificaciones de Pagos",
+        "description": "Notificaciones para pagos mensuales"
+      },
+      "marketingEmails": {
+        "label": "Emails de Marketing",
+        "description": "Recibe contenido promocional y ofertas"
+      }
+    },
+    "walletTab": {
+      "title": "Información de Billetera",
+      "address": "Dirección de Billetera Conectada",
+      "noWallet": "Sin billetera conectada",
+      "copyButton": "Copiar",
+      "network": "Red",
+      "networkValue": "Stacks Mainnet",
+      "balance": "Balance",
+      "explorerButton": "Ver en Explorer",
+      "disconnectButton": "Desconectar Billetera",
+      "security": {
+        "title": "Seguridad",
+        "description": "Tu billetera está asegurada por la extensión de tu navegador. Nunca tenemos acceso a tus claves privadas.",
+        "secured": "Tu billetera está conectada de forma segura vía Hiro Wallet"
+      }
+    }
+  },
+  "addProperty": {
+    "wallet": {
+      "connectTitle": "Conecta Tu Billetera",
+      "connectDescription": "Necesitas conectar tu billetera para listar una propiedad",
+      "connectButton": "Conectar Billetera"
+    },
+    "header": {
+      "title": "Listar Nueva Propiedad",
+      "description": "Tokeniza tu propiedad y comienza a recaudar capital"
+    },
+    "steps": {
+      "basicInfo": "Info Básica",
+      "financialDetails": "Detalles Financieros",
+      "propertyDetails": "Detalles de Propiedad",
+      "mediaDocuments": "Medios y Documentos"
+    },
+    "step1": {
+      "title": "Información Básica",
+      "propertyName": "Nombre de Propiedad",
+      "propertyNamePlaceholder": "ej., Penthouse de Lujo Manhattan",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe tu propiedad en detalle...",
+      "location": "Ubicación",
+      "locationPlaceholder": "ej., Nueva York, EE.UU.",
+      "propertyType": "Tipo de Propiedad",
+      "types": {
+        "residential": "Residencial",
+        "commercial": "Comercial",
+        "industrial": "Industrial",
+        "mixed": "Uso Mixto"
+      }
+    },
+    "step2": {
+      "title": "Detalles Financieros",
+      "totalValue": "Valor Total de Propiedad (USD)",
+      "totalValuePlaceholder": "500000",
+      "totalShares": "Acciones Totales",
+      "totalSharesPlaceholder": "1000",
+      "pricePerShare": "Precio por Acción (USD)",
+      "pricePerSharePlaceholder": "500",
+      "calculatedPrice": "Calculado: ${amount} por acción",
+      "expectedReturn": "Retorno Anual Esperado (%)",
+      "expectedReturnPlaceholder": "8",
+      "summary": {
+        "title": "Resumen",
+        "totalValue": "Valor Total",
+        "perShare": "Por Acción",
+        "totalShares": "Acciones Totales"
+      }
+    },
+    "step3": {
+      "title": "Especificaciones de Propiedad",
+      "bedrooms": "Dormitorios",
+      "bedroomsPlaceholder": "3",
+      "bathrooms": "Baños",
+      "bathroomsPlaceholder": "2",
+      "squareFeet": "Pies Cuadrados",
+      "squareFeetPlaceholder": "2000",
+      "yearBuilt": "Año de Construcción",
+      "yearBuiltPlaceholder": "2020"
+    },
+    "step4": {
+      "title": "Medios y Documentos",
+      "propertyImages": "Imágenes de Propiedad",
+      "legalDocuments": "Documentos Legales",
+      "uploadDocuments": "Subir documentos de propiedad",
+      "fileTypes": "PDF, DOC hasta 20MB"
+    },
+    "navigation": {
+      "previous": "Anterior",
+      "nextStep": "Siguiente Paso",
+      "submitting": "Enviando a Blockchain...",
+      "submitButton": "Enviar Propiedad a Blockchain"
+    },
+    "alerts": {
+      "fillRequired": "Por favor completa todos los campos requeridos",
+      "uploadImage": "Por favor sube al menos una imagen de la propiedad",
+      "uploadingMetadata": "Subiendo metadatos de propiedad a IPFS...",
+      "metadataUploaded": "Metadatos subidos a IPFS:",
+      "registering": "Registrando propiedad en blockchain...",
+      "success": "¡Propiedad registrada exitosamente!\n\nID de Transacción: {txId}\nIPFS de Metadatos: {ipfsHash}\n\nAparecerá en el mercado una vez que se confirme la transacción (~10 minutos).",
+      "cancelled": "Registro cancelado",
+      "error": "Error: {message}"
+    }
+  },
+  "propertyDetail": {
+    "loading": {
+      "message": "Cargando propiedad..."
+    },
+    "notFound": {
+      "title": "Propiedad no encontrada",
+      "backLink": "Volver al mercado"
+    },
+    "backButton": "Volver al Mercado",
+    "sharePrice": "Precio de Acción",
+    "usdApprox": "≈ ${amount} USD",
+    "fundingProgress": "Progreso de Financiamiento",
+    "sold": "vendidas",
+    "available": "disponibles",
+    "stats": {
+      "roi": "ROI",
+      "sharesSold": "Acciones Vendidas"
+    },
+    "purchaseButton": "Comprar Acciones",
+    "soldOut": "Agotado",
+    "info": {
+      "minPurchase": "• Compra mínima: 1 acción",
+      "dividend": "• Distribución mensual de dividendos",
+      "secured": "• Asegurado por blockchain"
+    },
+    "tabs": {
+      "overview": "Resumen",
+      "financials": "Financieros",
+      "documents": "Documentos"
+    },
+    "overview": {
+      "aboutTitle": "Sobre esta propiedad",
+      "featuresTitle": "Características",
+      "features": {
+        "primeLocation": "Ubicación Prime",
+        "highOccupancy": "Alta Tasa de Ocupación",
+        "professionalManagement": "Gestión Profesional",
+        "monthlyDividends": "Dividendos Mensuales"
+      }
+    },
+    "financials": {
+      "propertyValue": "Valor de Propiedad",
+      "annualRoi": "ROI Anual",
+      "totalRaised": "Total Recaudado",
+      "nextPayout": "Próximo Pago",
+      "tbd": "Por Determinar"
+    },
+    "documents": {
+      "emptyTitle": "Los documentos legales estarán disponibles pronto.",
+      "emptyDescription": "Los documentos se almacenarán en IPFS para transparencia."
+    },
+    "modal": {
+      "title": "Comprar Acciones",
+      "numberOfShares": "Número de Acciones",
+      "availableLabel": "Disponible: {amount} acciones",
+      "summary": {
+        "sharePrice": "Precio de Acción",
+        "quantity": "Cantidad",
+        "totalCost": "Costo Total",
+        "monthlyReturn": "Retorno Mensual Est."
+      },
+      "cancelButton": "Cancelar",
+      "confirmButton": "Confirmar Compra",
+      "processingButton": "Procesando...",
+      "connectWalletButton": "Conectar Billetera"
+    },
+    "alerts": {
+      "connectWallet": "Por favor conecta tu billetera primero",
+      "purchaseSuccess": "¡Compra exitosa! ID de Transacción: {txId}",
+      "purchaseCancelled": "Compra cancelada",
+      "purchaseFailed": "La compra falló. Por favor intenta de nuevo."
+    }
+  },
   "marketplace": {
     "title": "Mercado de Propiedades",
     "subtitle": "Explora oportunidades de bienes raíces tokenizados",
+    "hero": {
+      "title": "Invierte en Bienes Raíces con Bitcoin",
+      "subtitle": "Propiedad fraccionada impulsada por Stacks & sBTC",
+      "exploreButton": "Explorar Propiedades",
+      "listButton": "Lista Tu Propiedad"
+    },
+    "properties": {
+      "title": "Propiedades Disponibles",
+      "loading": "Cargando...",
+      "listings": "{count} listado",
+      "listingsPlural": "{count} listados",
+      "viewAll": "Ver todas"
+    },
+    "categories": {
+      "all": "Todas las Propiedades",
+      "residential": "Residencial",
+      "commercial": "Comercial",
+      "vacation": "Rentas Vacacionales",
+      "land": "Terreno",
+      "development": "En Desarrollo"
+    },
+    "empty": {
+      "title": "Sin Propiedades Aún",
+      "description": "¡Sé el primero en listar una propiedad en la plataforma!",
+      "listButton": "Listar Tu Propiedad"
+    },
+    "card": {
+      "sharePrice": "Precio de Acción",
+      "available": "Disponible",
+      "roiLabel": "{roi}% ROI"
+    },
+    "topProperties": {
+      "title": "Propiedades con Mejor Rendimiento",
+      "subtitle": "Mayor ROI",
+      "viewAll": "Ver todas",
+      "table": {
+        "property": "Propiedad",
+        "totalValue": "Valor Total",
+        "performance": "Rendimiento",
+        "investors": "Inversores",
+        "shares": "Acciones"
+      }
+    },
+    "loadingProperties": "Cargando propiedades desde blockchain...",
     "filters": {
       "title": "Filtros",
       "location": "Ubicación",

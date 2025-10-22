@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   Store,
   Briefcase,
@@ -16,43 +17,44 @@ export default function NavigationSidebar() {
   const pathname = usePathname();
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
+  const t = useTranslations('navigation');
 
   const navigation = [
     {
-      name: 'Marketplace',
+      name: t('marketplace.name'),
       href: `/${locale}/marketplace`,
       icon: Store,
-      description: 'Browse properties'
+      description: t('marketplace.description')
     },
     {
-      name: 'My Portfolio',
+      name: t('portfolio.name'),
       href: `/${locale}/portfolio`,
       icon: Briefcase,
-      description: 'Your investments'
+      description: t('portfolio.description')
     },
     {
-      name: 'My Properties',
+      name: t('properties.name'),
       href: `/${locale}/properties`,
       icon: Building2,
-      description: 'Properties you own'
+      description: t('properties.description')
     },
     {
-      name: 'Add Property',
+      name: t('addProperty.name'),
       href: `/${locale}/add-property`,
       icon: PlusCircle,
-      description: 'List a new property'
+      description: t('addProperty.description')
     },
     {
-      name: 'Transactions',
+      name: t('transactions.name'),
       href: `/${locale}/transactions`,
       icon: History,
-      description: 'Transaction history'
+      description: t('transactions.description')
     },
     {
-      name: 'Profile',
+      name: t('profile.name'),
       href: `/${locale}/profile`,
       icon: UserCircle,
-      description: 'Account settings'
+      description: t('profile.description')
     },
   ];
 
@@ -64,7 +66,7 @@ export default function NavigationSidebar() {
     <aside className="w-64 h-full bg-dark-bg/30 border-r border-dark-border p-4 space-y-2">
       <div className="mb-6 px-3">
         <h2 className="text-lg font-bold text-white">MicroPropiedad</h2>
-        <p className="text-xs text-gray-500">Real Estate Tokenization</p>
+        <p className="text-xs text-gray-500">{t('tagline')}</p>
       </div>
 
       <nav className="space-y-1">

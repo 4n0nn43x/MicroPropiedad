@@ -1,4 +1,31 @@
 {
+  "navigation": {
+    "tagline": "Real Estate Tokenization",
+    "marketplace": {
+      "name": "Marketplace",
+      "description": "Browse properties"
+    },
+    "portfolio": {
+      "name": "My Portfolio",
+      "description": "Your investments"
+    },
+    "properties": {
+      "name": "My Properties",
+      "description": "Properties you own"
+    },
+    "addProperty": {
+      "name": "Add Property",
+      "description": "List a new property"
+    },
+    "transactions": {
+      "name": "Transactions",
+      "description": "Transaction history"
+    },
+    "profile": {
+      "name": "Profile",
+      "description": "Account settings"
+    }
+  },
   "common": {
     "buttons": {
       "connect": "Connect Wallet",
@@ -135,9 +162,434 @@
       ]
     }
   },
+  "portfolio": {
+    "wallet": {
+      "connectTitle": "Connect Your Wallet",
+      "connectDescription": "Connect your wallet to view your portfolio",
+      "connectButton": "Connect Wallet"
+    },
+    "loading": {
+      "message": "Loading your portfolio from blockchain..."
+    },
+    "header": {
+      "title": "My Portfolio",
+      "description": "Track your real estate investments and returns"
+    },
+    "claimable": {
+      "title": "Claimable Payouts Available!",
+      "description": "You have unclaimed revenue distributions",
+      "usdApprox": "≈ ${amount} USD"
+    },
+    "stats": {
+      "totalInvested": "Total Invested",
+      "properties": "properties",
+      "currentValue": "Current Value",
+      "total": "total",
+      "totalReturns": "Total Returns",
+      "averageRoi": "Average ROI",
+      "totalShares": "Total Shares",
+      "acrossAll": "Across all properties"
+    },
+    "investments": {
+      "title": "My Investments",
+      "period": {
+        "all": "All Time",
+        "1M": "1M",
+        "3M": "3M",
+        "6M": "6M",
+        "1Y": "1Y"
+      },
+      "status": {
+        "active": "Active"
+      },
+      "sharesOwned": "Shares Owned",
+      "invested": "Invested",
+      "currentValue": "Current Value",
+      "returns": "Returns",
+      "claimablePayout": "Claimable Payout",
+      "noPending": "No pending payouts",
+      "viewDetails": "View Details",
+      "claiming": "Claiming...",
+      "claimButton": "Claim {amount} STX",
+      "transferShares": "Transfer Shares"
+    },
+    "empty": {
+      "title": "No Investments Yet",
+      "description": "Start building your real estate portfolio today",
+      "exploreButton": "Explore Properties"
+    },
+    "alerts": {
+      "connectWallet": "Please connect your wallet first",
+      "payoutClaimed": "Payout claimed successfully! Transaction ID: {txId}\n\nAmount: {amount} STX",
+      "claimCancelled": "Claim cancelled",
+      "claimError": "Error: {message}"
+    }
+  },
+  "properties": {
+    "wallet": {
+      "connectTitle": "Connect Your Wallet",
+      "connectDescription": "You need to connect your wallet to manage your properties",
+      "connectButton": "Connect Wallet"
+    },
+    "loading": {
+      "message": "Loading your properties from blockchain..."
+    },
+    "header": {
+      "title": "My Properties",
+      "description": "Manage properties you've listed on the platform",
+      "addButton": "+ Add New Property"
+    },
+    "stats": {
+      "totalProperties": "Total Properties",
+      "totalValue": "Total Value",
+      "totalRaised": "Total Raised",
+      "totalInvestors": "Total Investors"
+    },
+    "list": {
+      "title": "All Properties",
+      "fundingProgress": "Funding Progress",
+      "totalShares": "Total Shares",
+      "sharesSold": "Shares Sold",
+      "pricePerShare": "Price per Share",
+      "totalRaised": "Total Raised",
+      "roi": "ROI",
+      "sharesSoldLabel": "shares sold",
+      "available": "available"
+    },
+    "status": {
+      "active": "Active",
+      "soldOut": "Sold Out",
+      "pending": "Pending"
+    },
+    "menu": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": {
+      "title": "No Properties Listed Yet",
+      "description": "Start tokenizing your real estate and raise capital on the blockchain",
+      "addButton": "+ Add Your First Property"
+    }
+  },
+  "transactions": {
+    "wallet": {
+      "connectTitle": "Connect Your Wallet",
+      "connectDescription": "You need to connect your wallet to view your transactions",
+      "connectButton": "Connect Wallet"
+    },
+    "header": {
+      "title": "Transaction History",
+      "description": "View all your property transactions on the blockchain"
+    },
+    "stats": {
+      "totalTransactions": "Total Transactions",
+      "totalPurchased": "Total Purchased",
+      "totalSold": "Total Sold",
+      "totalPayouts": "Total Payouts"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by property name or transaction hash...",
+      "all": "All",
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "payout": "Payout"
+    },
+    "table": {
+      "type": "Type",
+      "property": "Property",
+      "shares": "Shares",
+      "amount": "Amount",
+      "date": "Date",
+      "transaction": "Transaction"
+    },
+    "types": {
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "payout": "Payout"
+    },
+    "empty": {
+      "title": "Transaction History Coming Soon",
+      "description": "Transaction indexing requires backend service.\nFor now, view your transactions on Stacks Explorer.",
+      "explorerButton": "Open Stacks Explorer"
+    }
+  },
+  "profile": {
+    "wallet": {
+      "connectTitle": "Connect Your Wallet",
+      "connectDescription": "You need to connect your wallet to access your profile",
+      "connectButton": "Connect Wallet"
+    },
+    "header": {
+      "title": "Account Settings",
+      "description": "Manage your profile and preferences"
+    },
+    "tabs": {
+      "general": "General",
+      "notifications": "Notifications",
+      "wallet": "Wallet"
+    },
+    "general": {
+      "profilePicture": {
+        "title": "Profile Picture",
+        "uploadNew": "Upload new picture",
+        "fileTypes": "JPG, PNG max 5MB"
+      },
+      "personalInfo": {
+        "title": "Personal Information",
+        "fullName": "Full Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "location": "Location",
+        "bio": "Bio"
+      },
+      "saveButton": "Save Changes"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "emailNotifications": {
+        "label": "Email Notifications",
+        "description": "Receive email updates about your account"
+      },
+      "newProperties": {
+        "label": "New Properties",
+        "description": "Get notified when new properties are listed"
+      },
+      "priceChanges": {
+        "label": "Price Changes",
+        "description": "Alerts when property prices change"
+      },
+      "payouts": {
+        "label": "Payout Notifications",
+        "description": "Notifications for monthly payouts"
+      },
+      "marketingEmails": {
+        "label": "Marketing Emails",
+        "description": "Receive promotional content and offers"
+      }
+    },
+    "walletTab": {
+      "title": "Wallet Information",
+      "address": "Connected Wallet Address",
+      "noWallet": "No wallet connected",
+      "copyButton": "Copy",
+      "network": "Network",
+      "networkValue": "Stacks Mainnet",
+      "balance": "Balance",
+      "explorerButton": "View in Explorer",
+      "disconnectButton": "Disconnect Wallet",
+      "security": {
+        "title": "Security",
+        "description": "Your wallet is secured by your browser extension. We never have access to your private keys.",
+        "secured": "Your wallet is securely connected via Hiro Wallet"
+      }
+    }
+  },
+  "addProperty": {
+    "wallet": {
+      "connectTitle": "Connect Your Wallet",
+      "connectDescription": "You need to connect your wallet to list a property",
+      "connectButton": "Connect Wallet"
+    },
+    "header": {
+      "title": "List a New Property",
+      "description": "Tokenize your property and start raising capital"
+    },
+    "steps": {
+      "basicInfo": "Basic Info",
+      "financialDetails": "Financial Details",
+      "propertyDetails": "Property Details",
+      "mediaDocuments": "Media & Documents"
+    },
+    "step1": {
+      "title": "Basic Information",
+      "propertyName": "Property Name",
+      "propertyNamePlaceholder": "e.g., Luxury Penthouse Manhattan",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your property in detail...",
+      "location": "Location",
+      "locationPlaceholder": "e.g., New York, USA",
+      "propertyType": "Property Type",
+      "types": {
+        "residential": "Residential",
+        "commercial": "Commercial",
+        "industrial": "Industrial",
+        "mixed": "Mixed Use"
+      }
+    },
+    "step2": {
+      "title": "Financial Details",
+      "totalValue": "Total Property Value (USD)",
+      "totalValuePlaceholder": "500000",
+      "totalShares": "Total Shares",
+      "totalSharesPlaceholder": "1000",
+      "pricePerShare": "Price per Share (USD)",
+      "pricePerSharePlaceholder": "500",
+      "calculatedPrice": "Calculated: ${amount} per share",
+      "expectedReturn": "Expected Annual Return (%)",
+      "expectedReturnPlaceholder": "8",
+      "summary": {
+        "title": "Summary",
+        "totalValue": "Total Value",
+        "perShare": "Per Share",
+        "totalShares": "Total Shares"
+      }
+    },
+    "step3": {
+      "title": "Property Specifications",
+      "bedrooms": "Bedrooms",
+      "bedroomsPlaceholder": "3",
+      "bathrooms": "Bathrooms",
+      "bathroomsPlaceholder": "2",
+      "squareFeet": "Square Feet",
+      "squareFeetPlaceholder": "2000",
+      "yearBuilt": "Year Built",
+      "yearBuiltPlaceholder": "2020"
+    },
+    "step4": {
+      "title": "Media & Documents",
+      "propertyImages": "Property Images",
+      "legalDocuments": "Legal Documents",
+      "uploadDocuments": "Upload property documents",
+      "fileTypes": "PDF, DOC up to 20MB"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "nextStep": "Next Step",
+      "submitting": "Submitting to Blockchain...",
+      "submitButton": "Submit Property to Blockchain"
+    },
+    "alerts": {
+      "fillRequired": "Please fill in all required fields",
+      "uploadImage": "Please upload at least one property image",
+      "uploadingMetadata": "Uploading property metadata to IPFS...",
+      "metadataUploaded": "Metadata uploaded to IPFS:",
+      "registering": "Registering property on blockchain...",
+      "success": "Property registered successfully!\n\nTransaction ID: {txId}\nMetadata IPFS: {ipfsHash}\n\nIt will appear in the marketplace once the transaction is confirmed (~10 minutes).",
+      "cancelled": "Registration cancelled",
+      "error": "Error: {message}"
+    }
+  },
+  "propertyDetail": {
+    "loading": {
+      "message": "Loading property..."
+    },
+    "notFound": {
+      "title": "Property not found",
+      "backLink": "Return to marketplace"
+    },
+    "backButton": "Back to Marketplace",
+    "sharePrice": "Share Price",
+    "usdApprox": "≈ ${amount} USD",
+    "fundingProgress": "Funding Progress",
+    "sold": "sold",
+    "available": "available",
+    "stats": {
+      "roi": "ROI",
+      "sharesSold": "Shares Sold"
+    },
+    "purchaseButton": "Purchase Shares",
+    "soldOut": "Sold Out",
+    "info": {
+      "minPurchase": "• Minimum purchase: 1 share",
+      "dividend": "• Monthly dividend distribution",
+      "secured": "• Secured by blockchain"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "financials": "Financials",
+      "documents": "Documents"
+    },
+    "overview": {
+      "aboutTitle": "About this property",
+      "featuresTitle": "Features",
+      "features": {
+        "primeLocation": "Prime Location",
+        "highOccupancy": "High Occupancy Rate",
+        "professionalManagement": "Professional Management",
+        "monthlyDividends": "Monthly Dividends"
+      }
+    },
+    "financials": {
+      "propertyValue": "Property Value",
+      "annualRoi": "Annual ROI",
+      "totalRaised": "Total Raised",
+      "nextPayout": "Next Payout",
+      "tbd": "TBD"
+    },
+    "documents": {
+      "emptyTitle": "Legal documents will be available soon.",
+      "emptyDescription": "Documents will be stored on IPFS for transparency."
+    },
+    "modal": {
+      "title": "Purchase Shares",
+      "numberOfShares": "Number of Shares",
+      "availableLabel": "Available: {amount} shares",
+      "summary": {
+        "sharePrice": "Share Price",
+        "quantity": "Quantity",
+        "totalCost": "Total Cost",
+        "monthlyReturn": "Est. Monthly Return"
+      },
+      "cancelButton": "Cancel",
+      "confirmButton": "Confirm Purchase",
+      "processingButton": "Processing...",
+      "connectWalletButton": "Connect Wallet"
+    },
+    "alerts": {
+      "connectWallet": "Please connect your wallet first",
+      "purchaseSuccess": "Purchase successful! Transaction ID: {txId}",
+      "purchaseCancelled": "Purchase cancelled",
+      "purchaseFailed": "Purchase failed. Please try again."
+    }
+  },
   "marketplace": {
     "title": "Property Marketplace",
     "subtitle": "Browse tokenized real estate opportunities",
+    "hero": {
+      "title": "Invest in Real Estate with Bitcoin",
+      "subtitle": "Fractional property ownership powered by Stacks & sBTC",
+      "exploreButton": "Explore Properties",
+      "listButton": "List Your Property"
+    },
+    "properties": {
+      "title": "Available Properties",
+      "loading": "Loading...",
+      "listings": "{count} listing",
+      "listingsPlural": "{count} listings",
+      "viewAll": "View all"
+    },
+    "categories": {
+      "all": "All Properties",
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "vacation": "Vacation Rentals",
+      "land": "Land",
+      "development": "Under Development"
+    },
+    "empty": {
+      "title": "No Properties Yet",
+      "description": "Be the first to list a property on the platform!",
+      "listButton": "List Your Property"
+    },
+    "card": {
+      "sharePrice": "Share Price",
+      "available": "Available",
+      "roiLabel": "{roi}% ROI"
+    },
+    "topProperties": {
+      "title": "Top Performing Properties",
+      "subtitle": "Highest ROI",
+      "viewAll": "View all",
+      "table": {
+        "property": "Property",
+        "totalValue": "Total Value",
+        "performance": "Performance",
+        "investors": "Investors",
+        "shares": "Shares"
+      }
+    },
+    "loadingProperties": "Loading properties from blockchain...",
     "filters": {
       "title": "Filters",
       "location": "Location",

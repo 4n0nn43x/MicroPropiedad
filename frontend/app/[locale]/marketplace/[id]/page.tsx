@@ -20,11 +20,13 @@ import {
   Building2,
   X,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useProperty } from '@/lib/hooks/useProperties';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { purchaseShares } from '@/lib/stacks/contracts';
 
 export default function PropertyDetailPage() {
+  const t = useTranslations('propertyDetail');
   const params = useParams();
   const propertyId = params?.id as string;
   const locale = (params?.locale as string) || 'en';
@@ -50,7 +52,7 @@ export default function PropertyDetailPage() {
       <div className="min-h-screen bg-dark-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading property...</p>
+          <p className="text-gray-400">{t('loading.message')}</p>
         </div>
       </div>
     );
@@ -61,9 +63,9 @@ export default function PropertyDetailPage() {
       <div className="min-h-screen bg-dark-bg flex items-center justify-center">
         <div className="text-center">
           <Building2 size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Property not found</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('notFound.title')}</h2>
           <Link href={`/${locale}/marketplace`} className="text-primary-400 hover:underline">
-            Return to marketplace
+            {t('notFound.backLink')}
           </Link>
         </div>
       </div>
@@ -75,7 +77,7 @@ export default function PropertyDetailPage() {
 
   const handlePurchase = async () => {
     if (!connected) {
-      alert('Please connect your wallet first');
+      alert(t('alerts.connectWallet'));
       return;
     }
 
@@ -88,17 +90,17 @@ export default function PropertyDetailPage() {
         property.sharePrice,
         {
           onFinish: (data) => {
-            alert(`Purchase successful! Transaction ID: ${data.txId}`);
+            alert(t('alerts.purchaseSuccess', { txId: data.txId }));
             setShowPurchaseModal(false);
           },
           onCancel: () => {
-            alert('Purchase cancelled');
+            alert(t('alerts.purchaseCancelled'));
           },
         }
       );
     } catch (error) {
       console.error('Purchase error:', error);
-      alert('Purchase failed. Please try again.');
+      alert(t('alerts.purchaseFailed'));
     } finally {
       setIsPurchasing(false);
     }
@@ -113,7 +115,7 @@ export default function PropertyDetailPage() {
           className="flex items-center gap-2 text-gray-400 hover:text-white transition w-fit"
         >
           <ChevronLeft size={20} />
-          <span>Back to Marketplace</span>
+          <span>{t('backButton')}</span>
         </Link>
       </div>
 
@@ -199,7 +201,7 @@ export default function PropertyDetailPage() {
                         : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    {tab}
+                    {t(`tabs.${tab}`)}
                   </button>
                 ))}
               </div>
@@ -209,28 +211,28 @@ export default function PropertyDetailPage() {
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-bold text-white mb-4">About this property</h3>
+                      <h3 className="text-xl font-bold text-white mb-4">{t('overview.aboutTitle')}</h3>
                       <p className="text-gray-400 leading-relaxed">{property.description}</p>
                     </div>
 
                     <div>
-                      <h3 className="text-xl font-bold text-white mb-4">Features</h3>
+                      <h3 className="text-xl font-bold text-white mb-4">{t('overview.featuresTitle')}</h3>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex items-center gap-2 text-gray-400">
                           <div className="w-2 h-2 bg-accent-green rounded-full" />
-                          <span>Prime Location</span>
+                          <span>{t('overview.features.primeLocation')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-400">
                           <div className="w-2 h-2 bg-accent-green rounded-full" />
-                          <span>High Occupancy Rate</span>
+                          <span>{t('overview.features.highOccupancy')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-400">
                           <div className="w-2 h-2 bg-accent-green rounded-full" />
-                          <span>Professional Management</span>
+                          <span>{t('overview.features.professionalManagement')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-400">
                           <div className="w-2 h-2 bg-accent-green rounded-full" />
-                          <span>Monthly Dividends</span>
+                          <span>{t('overview.features.monthlyDividends')}</span>
                         </div>
                       </div>
                     </div>
@@ -241,25 +243,25 @@ export default function PropertyDetailPage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-dark-bg p-4 rounded-xl">
-                        <p className="text-sm text-gray-500 mb-1">Property Value</p>
+                        <p className="text-sm text-gray-500 mb-1">{t('financials.propertyValue')}</p>
                         <p className="text-2xl font-bold text-white">
                           ${property.propertyValue.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-dark-bg p-4 rounded-xl">
-                        <p className="text-sm text-gray-500 mb-1">Annual ROI</p>
+                        <p className="text-sm text-gray-500 mb-1">{t('financials.annualRoi')}</p>
                         <p className="text-2xl font-bold text-accent-green">{property.roi}%</p>
                       </div>
                       <div className="bg-dark-bg p-4 rounded-xl">
-                        <p className="text-sm text-gray-500 mb-1">Total Raised</p>
+                        <p className="text-sm text-gray-500 mb-1">{t('financials.totalRaised')}</p>
                         <p className="text-2xl font-bold text-white">
                           {(property.soldShares * property.sharePrice).toLocaleString()} STX
                         </p>
                       </div>
                       <div className="bg-dark-bg p-4 rounded-xl">
-                        <p className="text-sm text-gray-500 mb-1">Next Payout</p>
+                        <p className="text-sm text-gray-500 mb-1">{t('financials.nextPayout')}</p>
                         <p className="text-2xl font-bold text-white">
-                          {property.nextPayoutDate || 'TBD'}
+                          {property.nextPayoutDate || t('financials.tbd')}
                         </p>
                       </div>
                     </div>
@@ -296,10 +298,10 @@ export default function PropertyDetailPage() {
                       <div className="text-center py-12">
                         <FileText size={48} className="mx-auto mb-4 text-gray-600" />
                         <p className="text-gray-400">
-                          Legal documents will be available soon.
+                          {t('documents.emptyTitle')}
                         </p>
                         <p className="text-sm text-gray-500 mt-2">
-                          Documents will be stored on IPFS for transparency.
+                          {t('documents.emptyDescription')}
                         </p>
                       </div>
                     )}
@@ -323,15 +325,15 @@ export default function PropertyDetailPage() {
 
               {/* Price */}
               <div className="bg-dark-bg p-4 rounded-xl">
-                <p className="text-sm text-gray-500 mb-1">Share Price</p>
+                <p className="text-sm text-gray-500 mb-1">{t('sharePrice')}</p>
                 <p className="text-3xl font-bold text-white">{property.sharePrice} STX</p>
-                <p className="text-sm text-gray-500 mt-1">≈ ${(property.sharePrice * 0.5).toFixed(2)} USD</p>
+                <p className="text-sm text-gray-500 mt-1">{t('usdApprox', { amount: (property.sharePrice * 0.5).toFixed(2) })}</p>
               </div>
 
               {/* Progress */}
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-400">Funding Progress</span>
+                  <span className="text-gray-400">{t('fundingProgress')}</span>
                   <span className="font-bold text-white">{progressPercent.toFixed(1)}%</span>
                 </div>
                 <div className="w-full bg-dark-bg rounded-full h-3 overflow-hidden mb-2">
@@ -341,8 +343,8 @@ export default function PropertyDetailPage() {
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>{property.soldShares.toLocaleString()} sold</span>
-                  <span>{availableShares.toLocaleString()} available</span>
+                  <span>{property.soldShares.toLocaleString()} {t('sold')}</span>
+                  <span>{availableShares.toLocaleString()} {t('available')}</span>
                 </div>
               </div>
 
@@ -351,14 +353,14 @@ export default function PropertyDetailPage() {
                 <div className="bg-dark-bg p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <Percent size={14} className="text-primary-400" />
-                    <p className="text-xs text-gray-500">ROI</p>
+                    <p className="text-xs text-gray-500">{t('stats.roi')}</p>
                   </div>
                   <p className="font-bold text-white">{property.roi}%</p>
                 </div>
                 <div className="bg-dark-bg p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <Users size={14} className="text-accent-purple" />
-                    <p className="text-xs text-gray-500">Shares Sold</p>
+                    <p className="text-xs text-gray-500">{t('stats.sharesSold')}</p>
                   </div>
                   <p className="font-bold text-white">{property.soldShares}</p>
                 </div>
@@ -370,14 +372,14 @@ export default function PropertyDetailPage() {
                 disabled={availableShares === 0}
                 className="btn btn-primary w-full"
               >
-                {availableShares === 0 ? 'Sold Out' : 'Purchase Shares'}
+                {availableShares === 0 ? t('soldOut') : t('purchaseButton')}
               </button>
 
               {/* Info */}
               <div className="text-xs text-gray-500 space-y-2">
-                <p>• Minimum purchase: 1 share</p>
-                <p>• Monthly dividend distribution</p>
-                <p>• Secured by blockchain</p>
+                <p>{t('info.minPurchase')}</p>
+                <p>{t('info.dividend')}</p>
+                <p>{t('info.secured')}</p>
               </div>
             </div>
           </div>
@@ -390,7 +392,7 @@ export default function PropertyDetailPage() {
           <div className="glass-card max-w-md w-full p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">Purchase Shares</h3>
+              <h3 className="text-2xl font-bold text-white">{t('modal.title')}</h3>
               <button
                 onClick={() => setShowPurchaseModal(false)}
                 className="text-gray-400 hover:text-white transition"
@@ -403,7 +405,7 @@ export default function PropertyDetailPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Number of Shares
+                  {t('modal.numberOfShares')}
                 </label>
                 <input
                   type="number"
@@ -414,26 +416,26 @@ export default function PropertyDetailPage() {
                   className="input-dark w-full"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Available: {availableShares.toLocaleString()} shares
+                  {t('modal.availableLabel', { amount: availableShares.toLocaleString() })}
                 </p>
               </div>
 
               {/* Summary */}
               <div className="bg-dark-bg p-4 rounded-xl space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Share Price</span>
+                  <span className="text-gray-400">{t('modal.summary.sharePrice')}</span>
                   <span className="text-white font-medium">{property.sharePrice} STX</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Quantity</span>
+                  <span className="text-gray-400">{t('modal.summary.quantity')}</span>
                   <span className="text-white font-medium">{numShares}</span>
                 </div>
                 <div className="border-t border-dark-border pt-3 flex justify-between">
-                  <span className="text-white font-bold">Total Cost</span>
+                  <span className="text-white font-bold">{t('modal.summary.totalCost')}</span>
                   <span className="text-white font-bold">{(property.sharePrice * numShares).toFixed(2)} STX</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Est. Monthly Return</span>
+                  <span className="text-gray-500">{t('modal.summary.monthlyReturn')}</span>
                   <span className="text-accent-green">
                     {((property.sharePrice * numShares * property.roi) / 100 / 12).toFixed(2)} STX
                   </span>
@@ -446,14 +448,14 @@ export default function PropertyDetailPage() {
                   onClick={() => setShowPurchaseModal(false)}
                   className="btn btn-outline flex-1"
                 >
-                  Cancel
+                  {t('modal.cancelButton')}
                 </button>
                 <button
                   onClick={handlePurchase}
                   disabled={isPurchasing || !connected}
                   className="btn btn-primary flex-1"
                 >
-                  {isPurchasing ? 'Processing...' : connected ? 'Confirm Purchase' : 'Connect Wallet'}
+                  {isPurchasing ? t('modal.processingButton') : connected ? t('modal.confirmButton') : t('modal.connectWalletButton')}
                 </button>
               </div>
             </div>

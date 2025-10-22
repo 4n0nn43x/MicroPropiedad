@@ -57,7 +57,7 @@ export default function Navbar() {
   }, [dropdownOpen]);
 
   return (
-    <div className="h-20 px-8 flex items-center justify-between border-b border-dark-border bg-dark-bg/50 backdrop-blur-xl">
+    <div className="h-20 px-8 flex items-center justify-between border-b border-dark-border bg-dark-bg/50 backdrop-blur-xl sticky top-0 z-50">
       {/* Search Bar */}
       <div className="flex-1 max-w-xl relative">
         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />

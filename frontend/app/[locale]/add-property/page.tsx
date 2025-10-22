@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Upload, MapPin, DollarSign, FileText, Image as ImageIcon, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { registerProperty } from '@/lib/stacks/contracts';
 import ImageUpload from '@/components/upload/ImageUpload';
 import { uploadPropertyMetadata } from '@/lib/ipfs/pinata';
 
 export default function AddPropertyPage() {
+  const t = useTranslations('addProperty');
   const router = useRouter();
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
@@ -42,10 +44,10 @@ export default function AddPropertyPage() {
   });
 
   const steps = [
-    { id: 1, name: 'Basic Info', icon: FileText },
-    { id: 2, name: 'Financial Details', icon: DollarSign },
-    { id: 3, name: 'Property Details', icon: MapPin },
-    { id: 4, name: 'Media & Documents', icon: ImageIcon },
+    { id: 1, name: t('steps.basicInfo'), icon: FileText },
+    { id: 2, name: t('steps.financialDetails'), icon: DollarSign },
+    { id: 3, name: t('steps.propertyDetails'), icon: MapPin },
+    { id: 4, name: t('steps.mediaDocuments'), icon: ImageIcon },
   ];
 
   const handleInputChange = (field: string, value: string | string[]) => {
@@ -67,12 +69,12 @@ export default function AddPropertyPage() {
   const handleSubmit = async () => {
     // Validation
     if (!formData.name || !formData.location || !formData.totalValue || !formData.totalShares) {
-      alert('Please fill in all required fields');
+      alert(t('alerts.fillRequired'));
       return;
     }
 
     if (formData.images.length === 0) {
-      alert('Please upload at least one property image');
+      alert(t('alerts.uploadImage'));
       return;
     }
 
@@ -105,11 +107,11 @@ export default function AddPropertyPage() {
         version: '1.0.0',
       };
 
-      console.log('Uploading property metadata to IPFS...');
+      console.log(t('alerts.uploadingMetadata'));
 
       // Step 2: Upload metadata to IPFS
       const metadataResult = await uploadPropertyMetadata(metadata);
-      console.log('Metadata uploaded to IPFS:', metadataResult.url);
+      console.log(t('alerts.metadataUploaded'), metadataResult.url);
 
       // Step 3: Generate property symbol from name (e.g., "Beach House" -> "BEACH")
       const symbol = formData.name
@@ -124,7 +126,7 @@ export default function AddPropertyPage() {
       const placeholderContractAddress = process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ';
       const propertyContractAddress = `${placeholderContractAddress}.property-${Date.now()}`;
 
-      console.log('Registering property on blockchain...');
+      console.log(t('alerts.registering'));
 
       // Step 5: Register property with the factory contract
       await registerProperty({
@@ -137,23 +139,18 @@ export default function AddPropertyPage() {
       }, {
         onFinish: (data) => {
           console.log('Property registered! Transaction:', data.txId);
-          alert(
-            `Property registered successfully!\n\n` +
-            `Transaction ID: ${data.txId}\n` +
-            `Metadata IPFS: ${metadataResult.IpfsHash}\n\n` +
-            `It will appear in the marketplace once the transaction is confirmed (~10 minutes).`
-          );
+          alert(t('alerts.success', { txId: data.txId, ipfsHash: metadataResult.IpfsHash }));
           router.push(`/${locale}/marketplace`);
         },
         onCancel: () => {
-          console.log('Registration cancelled');
+          console.log(t('alerts.cancelled'));
           setIsSubmitting(false);
         }
       });
     } catch (error) {
       console.error('Error registering property:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to register property';
-      alert(`Error: ${errorMessage}`);
+      alert(t('alerts.error', { message: errorMessage }));
       setIsSubmitting(false);
     }
   };
@@ -164,13 +161,13 @@ export default function AddPropertyPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <Upload size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-6">You need to connect your wallet to list a property</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('wallet.connectTitle')}</h2>
+          <p className="text-gray-400 mb-6">{t('wallet.connectDescription')}</p>
           <button
             onClick={connect}
             className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Connect Wallet
+            {t('wallet.connectButton')}
           </button>
         </div>
       </div>
@@ -181,8 +178,8 @@ export default function AddPropertyPage() {
     <div className="px-12 py-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">List a New Property</h1>
-        <p className="text-gray-400">Tokenize your property and start raising capital</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('header.title')}</h1>
+        <p className="text-gray-400">{t('header.description')}</p>
       </div>
 
       {/* Progress Steps */}
@@ -233,60 +230,60 @@ export default function AddPropertyPage() {
         {/* Step 1: Basic Info */}
         {currentStep === 1 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Basic Information</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('step1.title')}</h2>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Property Name *
+                {t('step1.propertyName')} *
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                placeholder="e.g., Luxury Penthouse Manhattan"
+                placeholder={t('step1.propertyNamePlaceholder')}
                 className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Description *
+                {t('step1.description')} *
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={5}
-                placeholder="Describe your property in detail..."
+                placeholder={t('step1.descriptionPlaceholder')}
                 className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Location *
+                {t('step1.location')} *
               </label>
               <input
                 type="text"
                 value={formData.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="e.g., New York, USA"
+                placeholder={t('step1.locationPlaceholder')}
                 className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Property Type *
+                {t('step1.propertyType')} *
               </label>
               <select
                 value={formData.propertyType}
                 onChange={(e) => handleInputChange('propertyType', e.target.value)}
                 className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
               >
-                <option value="residential">Residential</option>
-                <option value="commercial">Commercial</option>
-                <option value="industrial">Industrial</option>
-                <option value="mixed">Mixed Use</option>
+                <option value="residential">{t('step1.types.residential')}</option>
+                <option value="commercial">{t('step1.types.commercial')}</option>
+                <option value="industrial">{t('step1.types.industrial')}</option>
+                <option value="mixed">{t('step1.types.mixed')}</option>
               </select>
             </div>
           </div>
@@ -295,31 +292,31 @@ export default function AddPropertyPage() {
         {/* Step 2: Financial Details */}
         {currentStep === 2 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Financial Details</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('step2.title')}</h2>
 
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Total Property Value (USD) *
+                  {t('step2.totalValue')} *
                 </label>
                 <input
                   type="number"
                   value={formData.totalValue}
                   onChange={(e) => handleInputChange('totalValue', e.target.value)}
-                  placeholder="500000"
+                  placeholder={t('step2.totalValuePlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Total Shares *
+                  {t('step2.totalShares')} *
                 </label>
                 <input
                   type="number"
                   value={formData.totalShares}
                   onChange={(e) => handleInputChange('totalShares', e.target.value)}
-                  placeholder="1000"
+                  placeholder={t('step2.totalSharesPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
@@ -328,49 +325,49 @@ export default function AddPropertyPage() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Price per Share (USD) *
+                  {t('step2.pricePerShare')} *
                 </label>
                 <input
                   type="number"
                   value={formData.pricePerShare}
                   onChange={(e) => handleInputChange('pricePerShare', e.target.value)}
-                  placeholder="500"
+                  placeholder={t('step2.pricePerSharePlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
                 {formData.totalValue && formData.totalShares && (
                   <p className="mt-2 text-xs text-gray-500">
-                    Calculated: ${(Number(formData.totalValue) / Number(formData.totalShares)).toFixed(2)} per share
+                    {t('step2.calculatedPrice', { amount: (Number(formData.totalValue) / Number(formData.totalShares)).toFixed(2) })}
                   </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Expected Annual Return (%) *
+                  {t('step2.expectedReturn')} *
                 </label>
                 <input
                   type="number"
                   value={formData.expectedReturn}
                   onChange={(e) => handleInputChange('expectedReturn', e.target.value)}
-                  placeholder="8"
+                  placeholder={t('step2.expectedReturnPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
             </div>
 
             <div className="glass-card p-4 bg-primary-500/5 border border-primary-500/20">
-              <h3 className="text-sm font-medium text-primary-400 mb-2">Summary</h3>
+              <h3 className="text-sm font-medium text-primary-400 mb-2">{t('step2.summary.title')}</h3>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500">Total Value</p>
+                  <p className="text-gray-500">{t('step2.summary.totalValue')}</p>
                   <p className="text-white font-medium">${Number(formData.totalValue || 0).toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Per Share</p>
+                  <p className="text-gray-500">{t('step2.summary.perShare')}</p>
                   <p className="text-white font-medium">${formData.pricePerShare || '0'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Total Shares</p>
+                  <p className="text-gray-500">{t('step2.summary.totalShares')}</p>
                   <p className="text-white font-medium">{formData.totalShares || '0'}</p>
                 </div>
               </div>
@@ -381,31 +378,31 @@ export default function AddPropertyPage() {
         {/* Step 3: Property Details */}
         {currentStep === 3 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Property Specifications</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('step3.title')}</h2>
 
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Bedrooms
+                  {t('step3.bedrooms')}
                 </label>
                 <input
                   type="number"
                   value={formData.bedrooms}
                   onChange={(e) => handleInputChange('bedrooms', e.target.value)}
-                  placeholder="3"
+                  placeholder={t('step3.bedroomsPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Bathrooms
+                  {t('step3.bathrooms')}
                 </label>
                 <input
                   type="number"
                   value={formData.bathrooms}
                   onChange={(e) => handleInputChange('bathrooms', e.target.value)}
-                  placeholder="2"
+                  placeholder={t('step3.bathroomsPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
@@ -414,26 +411,26 @@ export default function AddPropertyPage() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Square Feet
+                  {t('step3.squareFeet')}
                 </label>
                 <input
                   type="number"
                   value={formData.squareFeet}
                   onChange={(e) => handleInputChange('squareFeet', e.target.value)}
-                  placeholder="2000"
+                  placeholder={t('step3.squareFeetPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Year Built
+                  {t('step3.yearBuilt')}
                 </label>
                 <input
                   type="number"
                   value={formData.yearBuilt}
                   onChange={(e) => handleInputChange('yearBuilt', e.target.value)}
-                  placeholder="2020"
+                  placeholder={t('step3.yearBuiltPlaceholder')}
                   className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
                 />
               </div>
@@ -444,11 +441,11 @@ export default function AddPropertyPage() {
         {/* Step 4: Media & Documents */}
         {currentStep === 4 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Media & Documents</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('step4.title')}</h2>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Property Images *
+                {t('step4.propertyImages')} *
               </label>
               <ImageUpload
                 onUploadComplete={(urls) => handleInputChange('images', urls)}
@@ -459,12 +456,12 @@ export default function AddPropertyPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Legal Documents
+                {t('step4.legalDocuments')}
               </label>
               <div className="border-2 border-dashed border-dark-border rounded-xl p-12 text-center hover:border-primary-500/50 transition cursor-pointer">
                 <Upload size={48} className="mx-auto text-gray-500 mb-4" />
-                <p className="text-white font-medium mb-1">Upload property documents</p>
-                <p className="text-sm text-gray-500">PDF, DOC up to 20MB</p>
+                <p className="text-white font-medium mb-1">{t('step4.uploadDocuments')}</p>
+                <p className="text-sm text-gray-500">{t('step4.fileTypes')}</p>
               </div>
             </div>
           </div>
@@ -482,7 +479,7 @@ export default function AddPropertyPage() {
               : 'bg-dark-card text-white hover:bg-dark-hover'
           }`}
         >
-          Previous
+          {t('navigation.previous')}
         </button>
 
         {currentStep < 4 ? (
@@ -490,7 +487,7 @@ export default function AddPropertyPage() {
             onClick={nextStep}
             className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Next Step
+            {t('navigation.nextStep')}
           </button>
         ) : (
           <button
@@ -502,7 +499,7 @@ export default function AddPropertyPage() {
                 : 'bg-accent-green hover:bg-accent-green/90 text-white'
             }`}
           >
-            {isSubmitting ? 'Submitting to Blockchain...' : 'Submit Property to Blockchain'}
+            {isSubmitting ? t('navigation.submitting') : t('navigation.submitButton')}
           </button>
         )}
       </div>

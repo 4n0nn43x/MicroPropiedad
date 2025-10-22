@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Building2, TrendingUp, MapPin, Clock } from 'lucide-react';
 import { useProperties } from '@/lib/hooks/useProperties';
+import { useTranslations } from 'next-intl';
 
 export default function MarketplacePage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const [activeCategory, setActiveCategory] = useState('all');
+  const t = useTranslations();
 
   // Fetch properties from smart contracts
   const { data: contractProperties, isLoading } = useProperties();
@@ -54,7 +56,7 @@ export default function MarketplacePage() {
     }));
 
   return (
-    <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto">
+    <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto relative">
       {/* Hero Banner */}
       <div className="relative h-64 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-purple" />
@@ -62,20 +64,22 @@ export default function MarketplacePage() {
           {/* Left Content */}
           <div className="max-w-xl space-y-4">
             <h1 className="text-5xl font-display font-bold text-white">
-              Invest in Real Estate<br />with Bitcoin
+              {t('marketplace.hero.title').split('with Bitcoin').map((part, i) => (
+                i === 0 ? <span key={i}>{part}<br /></span> : <span key={i}>with Bitcoin</span>
+              ))}
             </h1>
             <p className="text-white/90 text-lg">
-              Fractional property ownership powered by Stacks & sBTC
+              {t('marketplace.hero.subtitle')}
             </p>
             <div className="flex gap-4">
               <button className="px-8 py-3 bg-white text-primary-600 rounded-xl font-semibold hover:bg-white/90 transition">
-                Explore Properties
+                {t('marketplace.hero.exploreButton')}
               </button>
               <Link
                 href={`/${locale}/add-property`}
                 className="px-8 py-3 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition inline-block"
               >
-                List Your Property
+                {t('marketplace.hero.listButton')}
               </Link>
             </div>
           </div>

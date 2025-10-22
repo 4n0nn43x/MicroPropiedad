@@ -5,10 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { MoreVertical, Edit, Trash2, Eye, Users, DollarSign, TrendingUp, Wallet, Building2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useProperties } from '@/lib/hooks/useProperties';
 
 export default function MyPropertiesPage() {
+  const t = useTranslations('properties');
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const { connected, address, connect } = useWallet();
@@ -21,13 +23,13 @@ export default function MyPropertiesPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-6">You need to connect your wallet to manage your properties</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('wallet.connectTitle')}</h2>
+          <p className="text-gray-400 mb-6">{t('wallet.connectDescription')}</p>
           <button
             onClick={connect}
             className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
           >
-            Connect Wallet
+            {t('wallet.connectButton')}
           </button>
         </div>
       </div>
@@ -53,7 +55,7 @@ export default function MyPropertiesPage() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading your properties from blockchain...</p>
+          <p className="text-gray-400">{t('loading.message')}</p>
         </div>
       </div>
     );
@@ -75,11 +77,11 @@ export default function MyPropertiesPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return 'Active';
+        return t('status.active');
       case 'sold_out':
-        return 'Sold Out';
+        return t('status.soldOut');
       case 'pending':
-        return 'Pending';
+        return t('status.pending');
       default:
         return status;
     }
@@ -90,14 +92,14 @@ export default function MyPropertiesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">My Properties</h1>
-          <p className="text-gray-400">Manage properties you've listed on the platform</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{t('header.title')}</h1>
+          <p className="text-gray-400">{t('header.description')}</p>
         </div>
         <Link
           href={`/${locale}/add-property`}
           className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
         >
-          + Add New Property
+          {t('header.addButton')}
         </Link>
       </div>
 
@@ -105,7 +107,7 @@ export default function MyPropertiesPage() {
       <div className="grid grid-cols-4 gap-6">
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Properties</p>
+            <p className="text-sm text-gray-400">{t('stats.totalProperties')}</p>
             <div className="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center">
               <Users size={20} className="text-primary-400" />
             </div>
@@ -115,7 +117,7 @@ export default function MyPropertiesPage() {
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Value</p>
+            <p className="text-sm text-gray-400">{t('stats.totalValue')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-green/10 flex items-center justify-center">
               <DollarSign size={20} className="text-accent-green" />
             </div>
@@ -125,7 +127,7 @@ export default function MyPropertiesPage() {
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Raised</p>
+            <p className="text-sm text-gray-400">{t('stats.totalRaised')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-purple/10 flex items-center justify-center">
               <TrendingUp size={20} className="text-accent-purple" />
             </div>
@@ -135,7 +137,7 @@ export default function MyPropertiesPage() {
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">Total Investors</p>
+            <p className="text-sm text-gray-400">{t('stats.totalInvestors')}</p>
             <div className="w-10 h-10 rounded-full bg-accent-pink/10 flex items-center justify-center">
               <Users size={20} className="text-accent-pink" />
             </div>
@@ -146,20 +148,20 @@ export default function MyPropertiesPage() {
 
       {/* Properties Grid */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">All Properties</h2>
+        <h2 className="text-2xl font-bold text-white">{t('list.title')}</h2>
 
         {myProperties.length === 0 ? (
           <div className="glass-card p-12 text-center">
             <Building2 size={64} className="mx-auto mb-4 text-gray-600" />
-            <h3 className="text-xl font-bold text-white mb-2">No Properties Listed Yet</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('empty.title')}</h3>
             <p className="text-gray-400 mb-6">
-              Start tokenizing your real estate and raise capital on the blockchain
+              {t('empty.description')}
             </p>
             <Link
               href={`/${locale}/add-property`}
               className="inline-block px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
             >
-              + Add Your First Property
+              {t('empty.addButton')}
             </Link>
           </div>
         ) : (
@@ -201,18 +203,18 @@ export default function MyPropertiesPage() {
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-hover hover:text-white transition"
                           >
                             <Eye size={16} />
-                            <span>View</span>
+                            <span>{t('menu.view')}</span>
                           </Link>
                           <Link
                             href={`/${locale}/edit-property/${property.id}`}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-hover hover:text-white transition"
                           >
                             <Edit size={16} />
-                            <span>Edit</span>
+                            <span>{t('menu.edit')}</span>
                           </Link>
                           <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-dark-hover hover:text-red-300 transition">
                             <Trash2 size={16} />
-                            <span>Delete</span>
+                            <span>{t('menu.delete')}</span>
                           </button>
                         </div>
                       )}
@@ -223,7 +225,7 @@ export default function MyPropertiesPage() {
                 {/* Progress Bar */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Funding Progress</span>
+                    <span className="text-gray-400">{t('list.fundingProgress')}</span>
                     <span className="text-white font-medium">
                       {((property.soldShares / property.totalShares) * 100).toFixed(1)}%
                     </span>
@@ -238,37 +240,37 @@ export default function MyPropertiesPage() {
 
                 <div className="grid grid-cols-5 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Total Shares</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('list.totalShares')}</p>
                     <p className="text-sm font-bold text-white">{property.totalShares}</p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Shares Sold</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('list.sharesSold')}</p>
                     <p className="text-sm font-bold text-white">{property.soldShares}</p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Price per Share</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('list.pricePerShare')}</p>
                     <p className="text-sm font-bold text-white">{property.sharePrice} STX</p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Total Raised</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('list.totalRaised')}</p>
                     <p className="text-sm font-bold text-accent-green">
                       {(property.soldShares * property.sharePrice).toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">ROI</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('list.roi')}</p>
                     <p className="text-sm font-bold text-white">{property.roi}%</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
-                  <span className="text-sm text-gray-500">{property.soldShares} shares sold</span>
+                  <span className="text-sm text-gray-500">{property.soldShares} {t('list.sharesSoldLabel')}</span>
                   <span className="text-gray-600">•</span>
-                  <span className="text-sm text-gray-500">{property.totalShares - property.soldShares} available</span>
+                  <span className="text-sm text-gray-500">{property.totalShares - property.soldShares} {t('list.available')}</span>
                 </div>
               </div>
             </div>

@@ -2,30 +2,13 @@
 
 import { useState } from 'react';
 import { Camera, Mail, Phone, MapPin, Globe, Save, Shield, Bell, Wallet } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
 
 export default function ProfilePage() {
+  const t = useTranslations('profile');
   const { connected, address, connect } = useWallet();
   const [activeTab, setActiveTab] = useState('general');
-
-  // Wallet connection guard
-  if (!connected) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="text-center">
-          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-400 mb-6">You need to connect your wallet to access your profile</p>
-          <button
-            onClick={connect}
-            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
-          >
-            Connect Wallet
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const [profileData, setProfileData] = useState({
     name: 'John Doe',
@@ -45,9 +28,9 @@ export default function ProfilePage() {
   });
 
   const tabs = [
-    { id: 'general', label: 'General', icon: Shield },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'wallet', label: 'Wallet', icon: Wallet },
+    { id: 'general', label: t('tabs.general'), icon: Shield },
+    { id: 'notifications', label: t('tabs.notifications'), icon: Bell },
+    { id: 'wallet', label: t('tabs.wallet'), icon: Wallet },
   ];
 
   const handleSave = () => {
@@ -55,12 +38,31 @@ export default function ProfilePage() {
     // Add save logic here
   };
 
+  // Wallet connection guard
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">{t('wallet.connectTitle')}</h2>
+          <p className="text-gray-400 mb-6">{t('wallet.connectDescription')}</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            {t('wallet.connectButton')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-12 py-8 space-y-8 max-w-5xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Account Settings</h1>
-        <p className="text-gray-400">Manage your profile and preferences</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('header.title')}</h1>
+        <p className="text-gray-400">{t('header.description')}</p>
       </div>
 
       {/* Tabs */}
@@ -89,7 +91,7 @@ export default function ProfilePage() {
         <div className="space-y-8">
           {/* Avatar Section */}
           <div className="glass-card p-8">
-            <h2 className="text-xl font-bold text-white mb-6">Profile Picture</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{t('general.profilePicture.title')}</h2>
             <div className="flex items-center gap-6">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-primary-500 to-accent-purple">
@@ -104,19 +106,19 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div>
-                <p className="text-white font-medium mb-1">Upload new picture</p>
-                <p className="text-sm text-gray-500">JPG, PNG max 5MB</p>
+                <p className="text-white font-medium mb-1">{t('general.profilePicture.uploadNew')}</p>
+                <p className="text-sm text-gray-500">{t('general.profilePicture.fileTypes')}</p>
               </div>
             </div>
           </div>
 
           {/* Personal Information */}
           <div className="glass-card p-8">
-            <h2 className="text-xl font-bold text-white mb-6">Personal Information</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{t('general.personalInfo.title')}</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Full Name
+                  {t('general.personalInfo.fullName')}
                 </label>
                 <input
                   type="text"
@@ -128,7 +130,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
+                  {t('general.personalInfo.email')}
                 </label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -143,7 +145,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Phone Number
+                  {t('general.personalInfo.phone')}
                 </label>
                 <div className="relative">
                   <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -158,7 +160,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Location
+                  {t('general.personalInfo.location')}
                 </label>
                 <div className="relative">
                   <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -174,7 +176,7 @@ export default function ProfilePage() {
 
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Bio
+                {t('general.personalInfo.bio')}
               </label>
               <textarea
                 value={profileData.bio}
@@ -192,7 +194,7 @@ export default function ProfilePage() {
               className="flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
             >
               <Save size={20} />
-              <span>Save Changes</span>
+              <span>{t('general.saveButton')}</span>
             </button>
           </div>
         </div>
@@ -202,14 +204,14 @@ export default function ProfilePage() {
       {activeTab === 'notifications' && (
         <div className="space-y-6">
           <div className="glass-card p-8">
-            <h2 className="text-xl font-bold text-white mb-6">Notification Preferences</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{t('notifications.title')}</h2>
             <div className="space-y-4">
               {[
-                { key: 'emailNotifications', label: 'Email Notifications', description: 'Receive email updates about your account' },
-                { key: 'newProperties', label: 'New Properties', description: 'Get notified when new properties are listed' },
-                { key: 'priceChanges', label: 'Price Changes', description: 'Alerts when property prices change' },
-                { key: 'payouts', label: 'Payout Notifications', description: 'Notifications for monthly payouts' },
-                { key: 'marketingEmails', label: 'Marketing Emails', description: 'Receive promotional content and offers' },
+                { key: 'emailNotifications', label: t('notifications.emailNotifications.label'), description: t('notifications.emailNotifications.description') },
+                { key: 'newProperties', label: t('notifications.newProperties.label'), description: t('notifications.newProperties.description') },
+                { key: 'priceChanges', label: t('notifications.priceChanges.label'), description: t('notifications.priceChanges.description') },
+                { key: 'payouts', label: t('notifications.payouts.label'), description: t('notifications.payouts.description') },
+                { key: 'marketingEmails', label: t('notifications.marketingEmails.label'), description: t('notifications.marketingEmails.description') },
               ].map((setting) => (
                 <div
                   key={setting.key}
@@ -249,55 +251,55 @@ export default function ProfilePage() {
       {activeTab === 'wallet' && (
         <div className="space-y-6">
           <div className="glass-card p-8">
-            <h2 className="text-xl font-bold text-white mb-6">Wallet Information</h2>
+            <h2 className="text-xl font-bold text-white mb-6">{t('walletTab.title')}</h2>
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Connected Wallet Address
+                  {t('walletTab.address')}
                 </label>
                 <div className="flex items-center gap-3 p-4 bg-dark-card rounded-xl">
                   <Wallet size={20} className="text-primary-400" />
                   <code className="flex-1 text-white font-mono text-sm">
-                    {address || 'No wallet connected'}
+                    {address || t('walletTab.noWallet')}
                   </code>
                   <button className="px-4 py-2 bg-dark-hover hover:bg-dark-border text-white rounded-lg text-sm transition">
-                    Copy
+                    {t('walletTab.copyButton')}
                   </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="p-4 bg-dark-card/50 rounded-xl">
-                  <p className="text-sm text-gray-400 mb-1">Network</p>
-                  <p className="text-lg font-bold text-white">Stacks Mainnet</p>
+                  <p className="text-sm text-gray-400 mb-1">{t('walletTab.network')}</p>
+                  <p className="text-lg font-bold text-white">{t('walletTab.networkValue')}</p>
                 </div>
 
                 <div className="p-4 bg-dark-card/50 rounded-xl">
-                  <p className="text-sm text-gray-400 mb-1">Balance</p>
+                  <p className="text-sm text-gray-400 mb-1">{t('walletTab.balance')}</p>
                   <p className="text-lg font-bold text-white">1,250.45 STX</p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <button className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition">
-                  View in Explorer
+                  {t('walletTab.explorerButton')}
                 </button>
                 <button className="flex-1 px-6 py-3 bg-dark-card hover:bg-dark-hover text-white rounded-xl font-medium transition">
-                  Disconnect Wallet
+                  {t('walletTab.disconnectButton')}
                 </button>
               </div>
             </div>
           </div>
 
           <div className="glass-card p-8">
-            <h2 className="text-xl font-bold text-white mb-4">Security</h2>
+            <h2 className="text-xl font-bold text-white mb-4">{t('walletTab.security.title')}</h2>
             <p className="text-gray-400 text-sm mb-6">
-              Your wallet is secured by your browser extension. We never have access to your private keys.
+              {t('walletTab.security.description')}
             </p>
             <div className="flex items-center gap-3 p-4 bg-accent-green/10 border border-accent-green/20 rounded-xl">
               <Shield size={20} className="text-accent-green" />
               <p className="text-sm text-accent-green font-medium">
-                Your wallet is securely connected via Hiro Wallet
+                {t('walletTab.security.secured')}
               </p>
             </div>
           </div>

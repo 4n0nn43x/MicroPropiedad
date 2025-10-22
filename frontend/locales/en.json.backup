@@ -1,0 +1,285 @@
+{
+  "navigation": {
+    "tagline": "Real Estate Tokenization",
+    "marketplace": {
+      "name": "Marketplace",
+      "description": "Browse properties"
+    },
+    "portfolio": {
+      "name": "My Portfolio",
+      "description": "Your investments"
+    },
+    "properties": {
+      "name": "My Properties",
+      "description": "Properties you own"
+    },
+    "addProperty": {
+      "name": "Add Property",
+      "description": "List a new property"
+    },
+    "transactions": {
+      "name": "Transactions",
+      "description": "Transaction history"
+    },
+    "profile": {
+      "name": "Profile",
+      "description": "Account settings"
+    }
+  },
+  "common": {
+    "buttons": {
+      "connect": "Connect Wallet",
+      "disconnect": "Disconnect",
+      "buy": "Buy Shares",
+      "claim": "Claim Payout",
+      "explore": "Explore Properties",
+      "learnMore": "Learn More",
+      "getStarted": "Get Started",
+      "viewDetails": "View Details",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "labels": {
+      "shares": "Shares",
+      "price": "Price",
+      "roi": "ROI",
+      "location": "Location",
+      "status": "Status",
+      "totalSupply": "Total Supply",
+      "available": "Available",
+      "sold": "Sold",
+      "language": "Language"
+    },
+    "status": {
+      "active": "Active",
+      "soldOut": "Sold Out",
+      "upcoming": "Upcoming",
+      "paused": "Paused"
+    },
+    "errors": {
+      "walletNotConnected": "Please connect your wallet first",
+      "transactionFailed": "Transaction failed",
+      "insufficientBalance": "Insufficient balance",
+      "networkError": "Network error. Please try again.",
+      "invalidInput": "Invalid input"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "Invest in Real Estate with Bitcoin",
+      "subtitle": "Fractional property ownership on Stacks blockchain. Start investing from $10.",
+      "cta": "Start Investing"
+    },
+    "features": {
+      "title": "Why MicroPropiedad?",
+      "accessibility": {
+        "title": "Accessible to Everyone",
+        "description": "Invest in premium real estate starting from just $10. No minimum capital required."
+      },
+      "passive": {
+        "title": "Passive Income",
+        "description": "Earn rental income automatically distributed to your wallet every month."
+      },
+      "liquid": {
+        "title": "Instant Liquidity",
+        "description": "Buy and sell property shares anytime on our secondary marketplace."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Connect Your Wallet",
+        "description": "Use Xverse, Leather, or Hiro wallet to get started"
+      },
+      "step2": {
+        "title": "Browse Properties",
+        "description": "Explore tokenized real estate across Latin America"
+      },
+      "step3": {
+        "title": "Buy Shares",
+        "description": "Purchase fractional ownership with sBTC or STX"
+      },
+      "step4": {
+        "title": "Earn Returns",
+        "description": "Receive monthly rental income automatically"
+      }
+    },
+    "stats": {
+      "properties": "Properties Listed",
+      "investors": "Active Investors",
+      "volume": "Total Volume"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": {
+        "question": "What is fractional real estate?",
+        "answer": "Fractional real estate allows you to own a portion of a property by purchasing shares. Each share represents a percentage of the property's value and entitles you to proportional rental income."
+      },
+      "q2": {
+        "question": "How do I receive rental income?",
+        "answer": "Rental income is distributed automatically to all shareholders proportionally. You can claim your share directly from your dashboard anytime."
+      },
+      "q3": {
+        "question": "Is my investment secure?",
+        "answer": "All transactions are secured by the Stacks blockchain and Bitcoin's proof-of-work. Properties are legally structured through SPVs (Special Purpose Vehicles) for investor protection."
+      },
+      "q4": {
+        "question": "Can I sell my shares?",
+        "answer": "Yes! You can list your shares on our secondary marketplace and sell them to other investors at any time."
+      }
+    }
+  },
+  "login": {
+    "title": "Connect Your Wallet",
+    "subtitle": "Choose your preferred Stacks wallet to get started",
+    "wallets": {
+      "xverse": {
+        "name": "Xverse Wallet",
+        "description": "Most popular Stacks wallet with built-in Bitcoin support"
+      },
+      "leather": {
+        "name": "Leather Wallet",
+        "description": "Open-source wallet formerly known as Hiro Wallet"
+      },
+      "hiro": {
+        "name": "Hiro Wallet",
+        "description": "Developer-friendly wallet with advanced features"
+      }
+    },
+    "newToStacks": {
+      "title": "New to Stacks?",
+      "description": "Stacks brings smart contracts to Bitcoin. Choose a wallet above to create your account - it's free and takes less than 2 minutes.",
+      "learnMore": "Learn about Stacks"
+    },
+    "security": {
+      "title": "Your Keys, Your Crypto",
+      "points": [
+        "Non-custodial: You always control your assets",
+        "Secure: Protected by Bitcoin's proof-of-work",
+        "Private: No personal information required"
+      ]
+    }
+  },
+  "marketplace": {
+    "title": "Property Marketplace",
+    "subtitle": "Browse tokenized real estate opportunities",
+    "hero": {
+      "title": "Invest in Real Estate with Bitcoin",
+      "subtitle": "Fractional property ownership powered by Stacks & sBTC",
+      "exploreButton": "Explore Properties",
+      "listButton": "List Your Property"
+    },
+    "filters": {
+      "title": "Filters",
+      "location": "Location",
+      "priceRange": "Price Range",
+      "roiRange": "ROI Range",
+      "status": "Status",
+      "sortBy": "Sort By",
+      "sortOptions": {
+        "newest": "Newest First",
+        "priceAsc": "Price: Low to High",
+        "priceDesc": "Price: High to Low",
+        "roiDesc": "Highest ROI"
+      }
+    },
+    "noResults": "No properties found. Try adjusting your filters.",
+    "loadMore": "Load More Properties"
+  },
+  "property": {
+    "details": {
+      "overview": "Overview",
+      "financials": "Financials",
+      "documents": "Documents",
+      "activity": "Activity"
+    },
+    "stats": {
+      "sharePrice": "Share Price",
+      "totalShares": "Total Shares",
+      "availableShares": "Available",
+      "estimatedROI": "Estimated ROI",
+      "totalRaised": "Total Raised",
+      "investors": "Investors"
+    },
+    "purchase": {
+      "title": "Purchase Shares",
+      "selectAmount": "Number of Shares",
+      "totalCost": "Total Cost",
+      "estimatedReturns": "Estimated Monthly Returns",
+      "fees": "Platform Fee (2.5%)",
+      "confirm": "Confirm Purchase"
+    },
+    "documents": {
+      "propertyTitle": "Property Title",
+      "legalStructure": "Legal Structure",
+      "financialReport": "Financial Report",
+      "inspectionReport": "Inspection Report"
+    }
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "tabs": {
+      "portfolio": "Portfolio",
+      "holdings": "Holdings",
+      "activity": "Activity",
+      "payouts": "Payouts"
+    },
+    "portfolio": {
+      "totalValue": "Total Portfolio Value",
+      "totalInvested": "Total Invested",
+      "totalReturns": "Total Returns",
+      "roi": "Overall ROI"
+    },
+    "holdings": {
+      "property": "Property",
+      "shares": "Shares",
+      "value": "Current Value",
+      "returns": "Total Returns",
+      "actions": "Actions"
+    },
+    "payouts": {
+      "available": "Available to Claim",
+      "claimed": "Total Claimed",
+      "pending": "Pending",
+      "history": "Payout History",
+      "claimAll": "Claim All"
+    },
+    "activity": {
+      "recent": "Recent Activity",
+      "type": {
+        "purchase": "Purchase",
+        "claim": "Claim",
+        "transfer": "Transfer"
+      }
+    }
+  },
+  "footer": {
+    "company": {
+      "title": "Company",
+      "about": "About Us",
+      "careers": "Careers",
+      "press": "Press Kit"
+    },
+    "product": {
+      "title": "Product",
+      "marketplace": "Marketplace",
+      "howItWorks": "How It Works",
+      "pricing": "Pricing"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "compliance": "Compliance"
+    },
+    "social": {
+      "title": "Community",
+      "twitter": "Twitter",
+      "discord": "Discord",
+      "telegram": "Telegram"
+    },
+    "copyright": "© 2025 MicroPropiedad. Built on Stacks."
+  }
+}
