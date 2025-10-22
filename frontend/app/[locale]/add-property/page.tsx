@@ -1,10 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { Upload, MapPin, DollarSign, FileText, Image as ImageIcon, Check } from 'lucide-react';
+import { useWallet } from '@/lib/hooks/useWallet';
+import { registerProperty } from '@/lib/stacks/contracts';
+import ImageUpload from '@/components/upload/ImageUpload';
+import { uploadPropertyMetadata } from '@/lib/ipfs/pinata';
 
 export default function AddPropertyPage() {
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+  const { connected, connect } = useWallet();
+
+  // Initialize all hooks BEFORE any conditional returns
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
     name: '',
@@ -25,8 +37,8 @@ export default function AddPropertyPage() {
     yearBuilt: '',
 
     // Step 4: Documents & Images
-    images: [],
-    documents: [],
+    images: [] as string[],
+    documents: [] as string[],
   });
 
   const steps = [
@@ -36,7 +48,7 @@ export default function AddPropertyPage() {
     { id: 4, name: 'Media & Documents', icon: ImageIcon },
   ];
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -52,10 +64,118 @@ export default function AddPropertyPage() {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting property:', formData);
-    // Add blockchain submission logic here
+  const handleSubmit = async () => {
+    // Validation
+    if (!formData.name || !formData.location || !formData.totalValue || !formData.totalShares) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    if (formData.images.length === 0) {
+      alert('Please upload at least one property image');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Step 1: Create complete property metadata JSON
+      const sharePrice = Number(formData.pricePerShare) || Number(formData.totalValue) / Number(formData.totalShares);
+
+      const metadata = {
+        name: formData.name,
+        description: formData.description || 'Property description',
+        location: formData.location,
+        propertyType: formData.propertyType,
+        images: formData.images,
+        documents: formData.documents,
+        financials: {
+          totalValue: Number(formData.totalValue),
+          totalShares: Number(formData.totalShares),
+          sharePrice: sharePrice,
+          expectedReturn: Number(formData.expectedReturn) || 8,
+        },
+        details: {
+          bedrooms: Number(formData.bedrooms) || 0,
+          bathrooms: Number(formData.bathrooms) || 0,
+          squareFeet: Number(formData.squareFeet) || 0,
+          yearBuilt: Number(formData.yearBuilt) || 0,
+        },
+        createdAt: new Date().toISOString(),
+        version: '1.0.0',
+      };
+
+      console.log('Uploading property metadata to IPFS...');
+
+      // Step 2: Upload metadata to IPFS
+      const metadataResult = await uploadPropertyMetadata(metadata);
+      console.log('Metadata uploaded to IPFS:', metadataResult.url);
+
+      // Step 3: Generate property symbol from name (e.g., "Beach House" -> "BEACH")
+      const symbol = formData.name
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 10) || 'PROP';
+
+      // Step 4: For now, use a placeholder contract address
+      // TODO: In production, we should deploy a new property contract for each property
+      const placeholderContractAddress = process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ';
+      const propertyContractAddress = `${placeholderContractAddress}.property-${Date.now()}`;
+
+      console.log('Registering property on blockchain...');
+
+      // Step 5: Register property with the factory contract
+      await registerProperty({
+        contractAddress: propertyContractAddress,
+        name: formData.name,
+        symbol: symbol,
+        location: formData.location,
+        totalShares: Number(formData.totalShares),
+        metadataUri: metadataResult.url,
+      }, {
+        onFinish: (data) => {
+          console.log('Property registered! Transaction:', data.txId);
+          alert(
+            `Property registered successfully!\n\n` +
+            `Transaction ID: ${data.txId}\n` +
+            `Metadata IPFS: ${metadataResult.IpfsHash}\n\n` +
+            `It will appear in the marketplace once the transaction is confirmed (~10 minutes).`
+          );
+          router.push(`/${locale}/marketplace`);
+        },
+        onCancel: () => {
+          console.log('Registration cancelled');
+          setIsSubmitting(false);
+        }
+      });
+    } catch (error) {
+      console.error('Error registering property:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to register property';
+      alert(`Error: ${errorMessage}`);
+      setIsSubmitting(false);
+    }
   };
+
+  // Wallet connection guard - rendered AFTER all hooks are initialized
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Upload size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-400 mb-6">You need to connect your wallet to list a property</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-12 py-8 max-w-5xl mx-auto">
@@ -330,11 +450,11 @@ export default function AddPropertyPage() {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Property Images *
               </label>
-              <div className="border-2 border-dashed border-dark-border rounded-xl p-12 text-center hover:border-primary-500/50 transition cursor-pointer">
-                <Upload size={48} className="mx-auto text-gray-500 mb-4" />
-                <p className="text-white font-medium mb-1">Click to upload images</p>
-                <p className="text-sm text-gray-500">PNG, JPG up to 10MB</p>
-              </div>
+              <ImageUpload
+                onUploadComplete={(urls) => handleInputChange('images', urls)}
+                maxImages={5}
+                existingImages={formData.images}
+              />
             </div>
 
             <div>
@@ -375,9 +495,14 @@ export default function AddPropertyPage() {
         ) : (
           <button
             onClick={handleSubmit}
-            className="px-8 py-3 bg-accent-green hover:bg-accent-green/90 text-white rounded-xl font-medium transition"
+            disabled={isSubmitting}
+            className={`px-8 py-3 rounded-xl font-medium transition ${
+              isSubmitting
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-accent-green hover:bg-accent-green/90 text-white'
+            }`}
           >
-            Submit Property
+            {isSubmitting ? 'Submitting to Blockchain...' : 'Submit Property to Blockchain'}
           </button>
         )}
       </div>

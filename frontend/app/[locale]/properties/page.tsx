@@ -4,71 +4,60 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { MoreVertical, Edit, Trash2, Eye, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Users, DollarSign, TrendingUp, Wallet, Building2 } from 'lucide-react';
+import { useWallet } from '@/lib/hooks/useWallet';
+import { useProperties } from '@/lib/hooks/useProperties';
 
 export default function MyPropertiesPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
-  const [menuOpen, setMenuOpen] = useState<number | null>(null);
+  const { connected, address, connect } = useWallet();
+  const { data: allProperties, isLoading } = useProperties();
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
-  // Mock properties data (properties user has listed)
-  const myProperties = [
-    {
-      id: 1,
-      name: 'Luxury Penthouse Manhattan',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-      location: 'New York, USA',
-      totalShares: 1000,
-      sharesSold: 750,
-      sharesAvailable: 250,
-      pricePerShare: 500,
-      totalRaised: 375000,
-      totalValue: 500000,
-      monthlyRevenue: 12500,
-      investors: 45,
-      status: 'active',
-      createdAt: '2025-01-15',
-    },
-    {
-      id: 2,
-      name: 'Beachfront Villa Miami',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-      location: 'Miami, USA',
-      totalShares: 800,
-      sharesSold: 800,
-      sharesAvailable: 0,
-      pricePerShare: 600,
-      totalRaised: 480000,
-      totalValue: 480000,
-      monthlyRevenue: 9600,
-      investors: 32,
-      status: 'sold_out',
-      createdAt: '2024-11-20',
-    },
-    {
-      id: 3,
-      name: 'Modern Loft Downtown',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9',
-      location: 'Los Angeles, USA',
-      totalShares: 1200,
-      sharesSold: 450,
-      sharesAvailable: 750,
-      pricePerShare: 400,
-      totalRaised: 180000,
-      totalValue: 480000,
-      monthlyRevenue: 7200,
-      investors: 28,
-      status: 'active',
-      createdAt: '2025-09-10',
-    },
-  ];
+  // Wallet connection guard
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-400 mb-6">You need to connect your wallet to manage your properties</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
 
+  // Filter properties owned by current user (where they are the deployer)
+  const myProperties = allProperties?.filter(prop =>
+    prop.contractAddress.toLowerCase() === address?.toLowerCase()
+  ) || [];
+
+  // Calculate stats from blockchain data
   const stats = {
     totalProperties: myProperties.length,
-    totalValue: myProperties.reduce((sum, p) => sum + p.totalValue, 0),
-    totalRaised: myProperties.reduce((sum, p) => sum + p.totalRaised, 0),
-    totalInvestors: myProperties.reduce((sum, p) => sum + p.investors, 0),
+    totalValue: myProperties.reduce((sum, p) => sum + p.propertyValue, 0),
+    totalRaised: myProperties.reduce((sum, p) => sum + (p.soldShares * p.sharePrice), 0),
+    totalInvestors: myProperties.reduce((sum, p) => sum + p.soldShares, 0), // Approximate
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading your properties from blockchain...</p>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -159,13 +148,28 @@ export default function MyPropertiesPage() {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-white">All Properties</h2>
 
-        {myProperties.map((property) => (
+        {myProperties.length === 0 ? (
+          <div className="glass-card p-12 text-center">
+            <Building2 size={64} className="mx-auto mb-4 text-gray-600" />
+            <h3 className="text-xl font-bold text-white mb-2">No Properties Listed Yet</h3>
+            <p className="text-gray-400 mb-6">
+              Start tokenizing your real estate and raise capital on the blockchain
+            </p>
+            <Link
+              href={`/${locale}/add-property`}
+              className="inline-block px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+            >
+              + Add Your First Property
+            </Link>
+          </div>
+        ) : (
+          myProperties.map((property) => (
           <div key={property.id} className="glass-card p-6 hover:scale-[1.01] transition-transform">
             <div className="flex gap-6">
               {/* Property Image */}
               <div className="relative w-56 h-40 rounded-xl overflow-hidden flex-shrink-0">
                 <Image
-                  src={property.image}
+                  src={property.imageUrl}
                   alt={property.name}
                   fill
                   className="object-cover"
@@ -221,13 +225,13 @@ export default function MyPropertiesPage() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-400">Funding Progress</span>
                     <span className="text-white font-medium">
-                      {((property.sharesSold / property.totalShares) * 100).toFixed(1)}%
+                      {((property.soldShares / property.totalShares) * 100).toFixed(1)}%
                     </span>
                   </div>
                   <div className="h-2 bg-dark-card rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-primary-500 to-accent-purple rounded-full transition-all"
-                      style={{ width: `${(property.sharesSold / property.totalShares) * 100}%` }}
+                      style={{ width: `${(property.soldShares / property.totalShares) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -240,36 +244,37 @@ export default function MyPropertiesPage() {
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Shares Sold</p>
-                    <p className="text-sm font-bold text-white">{property.sharesSold}</p>
+                    <p className="text-sm font-bold text-white">{property.soldShares}</p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Price per Share</p>
-                    <p className="text-sm font-bold text-white">${property.pricePerShare}</p>
+                    <p className="text-sm font-bold text-white">{property.sharePrice} STX</p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Total Raised</p>
                     <p className="text-sm font-bold text-accent-green">
-                      ${property.totalRaised.toLocaleString()}
+                      {(property.soldShares * property.sharePrice).toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Monthly Revenue</p>
-                    <p className="text-sm font-bold text-white">${property.monthlyRevenue.toLocaleString()}</p>
+                    <p className="text-xs text-gray-500 mb-1">ROI</p>
+                    <p className="text-sm font-bold text-white">{property.roi}%</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
-                  <span className="text-sm text-gray-500">{property.investors} investors</span>
+                  <span className="text-sm text-gray-500">{property.soldShares} shares sold</span>
                   <span className="text-gray-600">•</span>
-                  <span className="text-sm text-gray-500">Listed on {property.createdAt}</span>
+                  <span className="text-sm text-gray-500">{property.totalShares - property.soldShares} available</span>
                 </div>
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </div>
   );

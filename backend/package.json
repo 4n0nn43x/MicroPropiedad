@@ -1,0 +1,32 @@
+{
+  "name": "micropropiedad-backend",
+  "version": "0.1.0",
+  "description": "Backend API and Oracle service for MicroPropiedad",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "oracle": "node src/oracle/index.js",
+    "test": "echo 'Backend tests to be implemented' && exit 0"
+  },
+  "keywords": [
+    "stacks",
+    "api",
+    "oracle",
+    "real-estate"
+  ],
+  "author": "MicroPropiedad Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "@stacks/transactions": "^7.2.0",
+    "@stacks/network": "^7.2.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6"
+  }
+}

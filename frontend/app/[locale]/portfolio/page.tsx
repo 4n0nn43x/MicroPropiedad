@@ -4,70 +4,104 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { TrendingUp, TrendingDown, DollarSign, Percent, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Percent, Calendar, Wallet } from 'lucide-react';
+import { useWallet } from '@/lib/hooks/useWallet';
+import { useUserPortfolio } from '@/lib/hooks/useProperties';
+import { claimPayout } from '@/lib/stacks/contracts';
 
 export default function PortfolioPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
-  const [selectedPeriod, setSelectedPeriod] = useState('all');
+  const { connected, address, connect } = useWallet();
+  const { data: portfolio, isLoading } = useUserPortfolio(address || undefined);
 
-  // Mock portfolio data
-  const stats = {
-    totalInvested: 125000,
-    currentValue: 158750,
-    totalReturns: 33750,
-    returnPercentage: 27,
-    propertiesOwned: 8,
-    totalShares: 245,
+  const [selectedPeriod, setSelectedPeriod] = useState('all');
+  const [claimingPropertyId, setClaimingPropertyId] = useState<string | null>(null);
+
+  // Calculate stats from real blockchain data
+  const stats = portfolio && portfolio.length > 0 ? {
+    totalInvested: portfolio.reduce((sum, inv) => sum + inv.invested, 0),
+    currentValue: portfolio.reduce((sum, inv) => sum + inv.currentValue, 0),
+    totalReturns: portfolio.reduce((sum, inv) => sum + (inv.currentValue - inv.invested), 0),
+    returnPercentage: portfolio.reduce((sum, inv) => sum + inv.invested, 0) > 0
+      ? ((portfolio.reduce((sum, inv) => sum + (inv.currentValue - inv.invested), 0) /
+          portfolio.reduce((sum, inv) => sum + inv.invested, 0)) * 100)
+      : 0,
+    propertiesOwned: portfolio.length,
+    totalShares: portfolio.reduce((sum, inv) => sum + inv.sharesOwned, 0),
+    claimableTotal: portfolio.reduce((sum, inv) => sum + (inv.claimableAmount || 0), 0),
+  } : {
+    totalInvested: 0,
+    currentValue: 0,
+    totalReturns: 0,
+    returnPercentage: 0,
+    propertiesOwned: 0,
+    totalShares: 0,
+    claimableTotal: 0,
   };
 
-  const investments = [
-    {
-      id: 1,
-      name: 'Modern Loft Downtown',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-      location: 'New York, USA',
-      sharesOwned: 45,
-      totalShares: 1000,
-      invested: 22500,
-      currentValue: 28800,
-      returns: 6300,
-      returnPercentage: 28,
-      monthlyPayout: 450,
-      nextPayout: '2025-11-15',
-      status: 'active',
-    },
-    {
-      id: 2,
-      name: 'Beachfront Villa',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-      location: 'Miami, USA',
-      sharesOwned: 30,
-      totalShares: 800,
-      invested: 18000,
-      currentValue: 21600,
-      returns: 3600,
-      returnPercentage: 20,
-      monthlyPayout: 360,
-      nextPayout: '2025-11-20',
-      status: 'active',
-    },
-    {
-      id: 3,
-      name: 'Urban Apartment Complex',
-      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
-      location: 'Los Angeles, USA',
-      sharesOwned: 60,
-      totalShares: 1200,
-      invested: 30000,
-      currentValue: 36000,
-      returns: 6000,
-      returnPercentage: 20,
-      monthlyPayout: 540,
-      nextPayout: '2025-11-18',
-      status: 'active',
-    },
-  ];
+  const handleClaimPayout = async (investment: any) => {
+    if (!connected || !address) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    setClaimingPropertyId(investment.id);
+
+    try {
+      await claimPayout(
+        `${investment.contractAddress}.${investment.contractName}`,
+        investment.currentRound,
+        {
+          onFinish: (data) => {
+            console.log('Payout claimed! Transaction:', data.txId);
+            alert(`Payout claimed successfully! Transaction ID: ${data.txId}\n\nAmount: ${investment.claimableAmount.toFixed(4)} STX`);
+            setClaimingPropertyId(null);
+          },
+          onCancel: () => {
+            console.log('Claim cancelled');
+            setClaimingPropertyId(null);
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error claiming payout:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to claim payout';
+      alert(`Error: ${errorMessage}`);
+      setClaimingPropertyId(null);
+    }
+  };
+
+  // Not connected view
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-400 mb-6">Connect your wallet to view your portfolio</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading view
+  if (isLoading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading your portfolio from blockchain...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-12 py-8 space-y-8 max-w-[1800px] mx-auto">
@@ -76,6 +110,22 @@ export default function PortfolioPage() {
         <h1 className="text-3xl font-bold text-white mb-2">My Portfolio</h1>
         <p className="text-gray-400">Track your real estate investments and returns</p>
       </div>
+
+      {/* Claimable Payouts Alert */}
+      {stats.claimableTotal > 0 && (
+        <div className="glass-card p-6 bg-accent-green/10 border border-accent-green/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white mb-1">Claimable Payouts Available!</h3>
+              <p className="text-gray-400">You have unclaimed revenue distributions</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-accent-green">{stats.claimableTotal.toFixed(4)} STX</p>
+              <p className="text-sm text-gray-500">≈ ${(stats.claimableTotal * 0.5).toFixed(2)} USD</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-6">
@@ -153,14 +203,15 @@ export default function PortfolioPage() {
       </div>
 
       {/* Investments List */}
-      <div className="space-y-4">
-        {investments.map((investment) => (
+      {portfolio && portfolio.length > 0 ? (
+        <div className="space-y-4">
+          {portfolio.map((investment) => (
           <div key={investment.id} className="glass-card p-6 hover:scale-[1.01] transition-transform">
             <div className="flex gap-6">
               {/* Property Image */}
               <div className="relative w-48 h-32 rounded-xl overflow-hidden flex-shrink-0">
                 <Image
-                  src={investment.image}
+                  src={investment.imageUrl}
                   alt={investment.name}
                   fill
                   className="object-cover"
@@ -186,37 +237,43 @@ export default function PortfolioPage() {
                       {investment.sharesOwned} / {investment.totalShares}
                     </p>
                     <p className="text-xs text-gray-600">
-                      {((investment.sharesOwned / investment.totalShares) * 100).toFixed(1)}%
+                      {((investment.sharesOwned / investment.totalShares) * 100).toFixed(2)}%
                     </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Invested</p>
                     <p className="text-sm font-bold text-white">
-                      ${investment.invested.toLocaleString()}
+                      {investment.invested.toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Current Value</p>
                     <p className="text-sm font-bold text-white">
-                      ${investment.currentValue.toLocaleString()}
+                      {investment.currentValue.toFixed(2)} STX
                     </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Returns</p>
                     <p className="text-sm font-bold text-accent-green">
-                      +${investment.returns.toLocaleString()} ({investment.returnPercentage}%)
+                      +{(investment.currentValue - investment.invested).toFixed(2)} STX ({(((investment.currentValue - investment.invested) / investment.invested) * 100).toFixed(1)}%)
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Monthly Payout</p>
-                    <p className="text-sm font-bold text-white">
-                      ${investment.monthlyPayout}
-                    </p>
-                    <p className="text-xs text-gray-600">Next: {investment.nextPayout}</p>
+                    <p className="text-xs text-gray-500 mb-1">Claimable Payout</p>
+                    {investment.claimableAmount > 0 ? (
+                      <>
+                        <p className="text-sm font-bold text-accent-green">
+                          {investment.claimableAmount.toFixed(4)} STX
+                        </p>
+                        <p className="text-xs text-accent-green">Round #{investment.currentRound}</p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-600">No pending payouts</p>
+                    )}
                   </div>
                 </div>
 
@@ -227,18 +284,44 @@ export default function PortfolioPage() {
                   >
                     View Details
                   </Link>
-                  <button className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition">
-                    Claim Payout
-                  </button>
-                  <button className="px-4 py-2 bg-dark-card hover:bg-dark-hover text-white rounded-lg text-sm font-medium transition">
-                    Sell Shares
+                  {investment.claimableAmount > 0 && (
+                    <button
+                      onClick={() => handleClaimPayout(investment)}
+                      disabled={claimingPropertyId === investment.id}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                        claimingPropertyId === investment.id
+                          ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+                          : 'bg-accent-green hover:bg-accent-green/90 text-white'
+                      }`}
+                    >
+                      {claimingPropertyId === investment.id ? 'Claiming...' : `Claim ${investment.claimableAmount.toFixed(4)} STX`}
+                    </button>
+                  )}
+                  <button
+                    className="px-4 py-2 bg-dark-card hover:bg-dark-hover text-white rounded-lg text-sm font-medium transition"
+                    title="Coming soon"
+                  >
+                    Transfer Shares
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="glass-card p-12 text-center">
+          <TrendingUp size={64} className="mx-auto mb-4 text-gray-600" />
+          <h3 className="text-xl font-bold text-white mb-2">No Investments Yet</h3>
+          <p className="text-gray-400 mb-6">Start building your real estate portfolio today</p>
+          <Link
+            href={`/${locale}/marketplace`}
+            className="inline-block px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Explore Properties
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

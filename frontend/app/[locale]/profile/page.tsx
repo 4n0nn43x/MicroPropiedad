@@ -5,8 +5,27 @@ import { Camera, Mail, Phone, MapPin, Globe, Save, Shield, Bell, Wallet } from '
 import { useWallet } from '@/lib/hooks/useWallet';
 
 export default function ProfilePage() {
-  const { address } = useWallet();
+  const { connected, address, connect } = useWallet();
   const [activeTab, setActiveTab] = useState('general');
+
+  // Wallet connection guard
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-400 mb-6">You need to connect your wallet to access your profile</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const [profileData, setProfileData] = useState({
     name: 'John Doe',

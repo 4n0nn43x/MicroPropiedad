@@ -102,41 +102,49 @@ export const claimPayout = async (
 
 /**
  * Register a new property (owner only)
+ *
+ * Smart contract expects:
+ * 1. contract-addr (principal) - address of the property SIP-010 contract
+ * 2. name (string-ascii 32) - property name
+ * 3. symbol (string-ascii 10) - property token symbol
+ * 4. total-shares (uint) - total number of shares
+ * 5. location (string-utf8 256) - property location
+ * 6. metadata-uri (string-utf8 256) - IPFS URI with full property metadata JSON
  */
 export const registerProperty = async (
   propertyData: {
+    contractAddress: string; // The deployed property contract address
     name: string;
+    symbol: string;
     location: string;
-    description: string;
-    imageUrl: string;
     totalShares: number;
-    sharePrice: number;
-    propertyValue: number;
-    roi: number;
+    metadataUri: string; // IPFS URI with full metadata (images, description, etc.)
   },
   callbacks?: TransactionCallbacks
 ) => {
-  const [contractAddress, contractName] = FACTORY_CONTRACT.split('.');
+  const [factoryAddress, factoryName] = FACTORY_CONTRACT.split('.');
+
+  // Validate name and symbol lengths for Clarity
+  const name = propertyData.name.substring(0, 32);
+  const symbol = propertyData.symbol.substring(0, 10);
 
   const functionArgs = [
-    stringUtf8CV(propertyData.name),
-    stringUtf8CV(propertyData.location),
-    stringUtf8CV(propertyData.description),
-    stringUtf8CV(propertyData.imageUrl),
-    uintCV(propertyData.totalShares),
-    uintCV(Math.floor(propertyData.sharePrice * 1000000)), // Convert to micro-STX
-    uintCV(propertyData.propertyValue),
-    uintCV(Math.floor(propertyData.roi * 100)), // Store as basis points
+    principalCV(propertyData.contractAddress), // contract-addr
+    stringAsciiCV(name), // name (max 32 chars)
+    stringAsciiCV(symbol), // symbol (max 10 chars)
+    uintCV(propertyData.totalShares), // total-shares
+    stringUtf8CV(propertyData.location), // location
+    stringUtf8CV(propertyData.metadataUri), // metadata-uri
   ];
 
   return openContractCall({
-    contractAddress,
-    contractName,
+    contractAddress: factoryAddress,
+    contractName: factoryName,
     functionName: 'register-property',
     functionArgs,
     network,
     anchorMode: AnchorMode.Any,
-    postConditionMode: PostConditionMode.Deny,
+    postConditionMode: PostConditionMode.Allow,
     onFinish: (data) => {
       console.log('Property registration submitted:', data.txId);
       callbacks?.onFinish?.(data);

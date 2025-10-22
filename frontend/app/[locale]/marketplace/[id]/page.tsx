@@ -38,20 +38,12 @@ export default function PropertyDetailPage() {
   const [numShares, setNumShares] = useState(1);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
-  // Mock images for carousel (in real app, these come from property data)
-  const images = [
-    'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
-    'https://images.unsplash.com/photo-1582407947304-fd86f028f716',
-  ];
+  // Use property image from blockchain (will use single image until multiple images supported)
+  const images = property ? [property.imageUrl] : [];
 
-  const documents = [
-    { name: 'Property Title', type: 'PDF', size: '2.4 MB', url: '#' },
-    { name: 'Legal Structure', type: 'PDF', size: '1.8 MB', url: '#' },
-    { name: 'Financial Report', type: 'PDF', size: '3.2 MB', url: '#' },
-    { name: 'Inspection Report', type: 'PDF', size: '4.1 MB', url: '#' },
-  ];
+  // Documents will be stored on IPFS/Arweave in production
+  // For now, this is a placeholder for the documents tab
+  const documents: Array<{ name: string; type: string; size: string; url: string }> = [];
 
   if (isLoading) {
     return (
@@ -275,28 +267,42 @@ export default function PropertyDetailPage() {
                 )}
 
                 {activeTab === 'documents' && (
-                  <div className="space-y-3">
-                    {documents.map((doc, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-4 bg-dark-bg rounded-xl hover:bg-dark-hover transition group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
-                            <FileText size={20} className="text-primary-400" />
+                  <div>
+                    {documents.length > 0 ? (
+                      <div className="space-y-3">
+                        {documents.map((doc, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-4 bg-dark-bg rounded-xl hover:bg-dark-hover transition group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                                <FileText size={20} className="text-primary-400" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-white">{doc.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {doc.type} • {doc.size}
+                                </p>
+                              </div>
+                            </div>
+                            <button className="opacity-0 group-hover:opacity-100 transition">
+                              <Download size={20} className="text-gray-400 hover:text-white" />
+                            </button>
                           </div>
-                          <div>
-                            <p className="font-medium text-white">{doc.name}</p>
-                            <p className="text-sm text-gray-500">
-                              {doc.type} • {doc.size}
-                            </p>
-                          </div>
-                        </div>
-                        <button className="opacity-0 group-hover:opacity-100 transition">
-                          <Download size={20} className="text-gray-400 hover:text-white" />
-                        </button>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <div className="text-center py-12">
+                        <FileText size={48} className="mx-auto mb-4 text-gray-600" />
+                        <p className="text-gray-400">
+                          Legal documents will be available soon.
+                        </p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Documents will be stored on IPFS for transparency.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -352,9 +358,9 @@ export default function PropertyDetailPage() {
                 <div className="bg-dark-bg p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <Users size={14} className="text-accent-purple" />
-                    <p className="text-xs text-gray-500">Investors</p>
+                    <p className="text-xs text-gray-500">Shares Sold</p>
                   </div>
-                  <p className="font-bold text-white">145</p>
+                  <p className="font-bold text-white">{property.soldShares}</p>
                 </div>
               </div>
 

@@ -1,79 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, ExternalLink, Filter, Search } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, ExternalLink, Filter, Search, Wallet } from 'lucide-react';
+import { useWallet } from '@/lib/hooks/useWallet';
 
 export default function TransactionsPage() {
+  const { connected, connect } = useWallet();
   const [filterType, setFilterType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock transactions data
-  const transactions = [
-    {
-      id: '0x1a2b3c...',
-      type: 'purchase',
-      propertyName: 'Modern Loft Downtown',
-      shares: 45,
-      amount: 22500,
-      pricePerShare: 500,
-      timestamp: '2025-10-15 14:32:18',
-      status: 'confirmed',
-      txHash: '0x1a2b3c4d5e6f7g8h9i0j...',
-    },
-    {
-      id: '0x2b3c4d...',
-      type: 'payout',
-      propertyName: 'Beachfront Villa',
-      shares: 30,
-      amount: 360,
-      timestamp: '2025-10-14 09:15:42',
-      status: 'confirmed',
-      txHash: '0x2b3c4d5e6f7g8h9i0j1k...',
-    },
-    {
-      id: '0x3c4d5e...',
-      type: 'purchase',
-      propertyName: 'Urban Apartment Complex',
-      shares: 60,
-      amount: 30000,
-      pricePerShare: 500,
-      timestamp: '2025-10-12 16:45:30',
-      status: 'confirmed',
-      txHash: '0x3c4d5e6f7g8h9i0j1k2l...',
-    },
-    {
-      id: '0x4d5e6f...',
-      type: 'sale',
-      propertyName: 'Downtown Penthouse',
-      shares: 20,
-      amount: 12000,
-      pricePerShare: 600,
-      timestamp: '2025-10-10 11:20:15',
-      status: 'confirmed',
-      txHash: '0x4d5e6f7g8h9i0j1k2l3m...',
-    },
-    {
-      id: '0x5e6f7g...',
-      type: 'payout',
-      propertyName: 'Modern Loft Downtown',
-      shares: 45,
-      amount: 450,
-      timestamp: '2025-10-08 10:00:00',
-      status: 'confirmed',
-      txHash: '0x5e6f7g8h9i0j1k2l3m4n...',
-    },
-    {
-      id: '0x6f7g8h...',
-      type: 'purchase',
-      propertyName: 'Beachfront Villa',
-      shares: 30,
-      amount: 18000,
-      pricePerShare: 600,
-      timestamp: '2025-09-28 13:50:22',
-      status: 'confirmed',
-      txHash: '0x6f7g8h9i0j1k2l3m4n5o...',
-    },
-  ];
+  // Wallet connection guard
+  if (!connected) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <Wallet size={64} className="mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-400 mb-6">You need to connect your wallet to view your transactions</p>
+          <button
+            onClick={connect}
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Transaction history will be indexed by backend
+  // For now, users can view transactions in Stacks Explorer
+  const transactions: any[] = [];
 
   const filteredTransactions = transactions.filter(tx => {
     const matchesType = filterType === 'all' || tx.type === filterType;
@@ -264,7 +221,19 @@ export default function TransactionsPage() {
         {/* Empty State */}
         {filteredTransactions.length === 0 && (
           <div className="px-6 py-12 text-center">
-            <p className="text-gray-500">No transactions found</p>
+            <ArrowUpRight size={48} className="mx-auto mb-4 text-gray-600" />
+            <h3 className="text-xl font-bold text-white mb-2">Transaction History Coming Soon</h3>
+            <p className="text-gray-400 mb-6">
+              Transaction indexing requires backend service.<br />
+              For now, view your transactions on Stacks Explorer.
+            </p>
+            <button
+              onClick={() => window.open('https://explorer.hiro.so/?chain=testnet', '_blank')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+            >
+              Open Stacks Explorer
+              <ExternalLink size={18} />
+            </button>
           </div>
         )}
       </div>

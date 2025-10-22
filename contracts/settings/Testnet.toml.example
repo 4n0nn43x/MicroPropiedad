@@ -1,0 +1,13 @@
+[network]
+name = "testnet"
+stacks_node_rpc_address = "https://api.testnet.hiro.so"
+deployment_fee_rate = 10
+
+[accounts.deployer]
+# Replace with your 12 or 24-word mnemonic phrase
+# Get testnet STX from: https://explorer.hiro.so/sandbox/faucet?chain=testnet
+# ⚠️ NEVER commit your real mnemonic to Git!
+mnemonic = "your twelve word mnemonic phrase goes here in quotes all words separated by spaces"
+
+# Example (DO NOT USE - this is a well-known test phrase):
+# mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"

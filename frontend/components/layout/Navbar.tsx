@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Bell, User, ChevronDown, LogOut, Copy, ExternalLink, UserCircle } from 'lucide-react';
 import { useWallet } from '@/lib/hooks/useWallet';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Navbar() {
-  const { connected, address, disconnect } = useWallet();
+  const { connected, address, disconnect, connect } = useWallet();
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -62,7 +63,7 @@ export default function Navbar() {
         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
         <input
           type="text"
-          placeholder="Search items, collections, accounts"
+          placeholder="Search properties and listings"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-11 pr-4 py-2.5 bg-dark-card/50 border-0 rounded-xl text-sm text-white placeholder-gray-500 focus:bg-dark-card focus:ring-1 focus:ring-primary-500/30 transition"
@@ -71,6 +72,23 @@ export default function Navbar() {
 
       {/* Right Section */}
       <div className="flex items-center gap-6">
+        {/* Language Switcher */}
+        <div className="flex items-center gap-2 bg-dark-card px-3 py-1.5 rounded-lg border border-dark-border">
+          <Link
+            href={`/en${pathname.replace(/^\/[a-z]{2}/, '')}`}
+            className={`text-sm transition ${locale === 'en' ? 'text-primary-400 font-bold' : 'text-gray-400 hover:text-gray-200'}`}
+          >
+            EN
+          </Link>
+          <span className="text-dark-border">|</span>
+          <Link
+            href={`/es${pathname.replace(/^\/[a-z]{2}/, '')}`}
+            className={`text-sm transition ${locale === 'es' ? 'text-primary-400 font-bold' : 'text-gray-400 hover:text-gray-200'}`}
+          >
+            ES
+          </Link>
+        </div>
+
         {/* Notifications */}
         <button className="relative text-gray-400 hover:text-white transition">
           <Bell size={20} />
@@ -97,7 +115,7 @@ export default function Navbar() {
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-3 w-56 bg-dark-card border border-dark-border rounded-xl shadow-2xl overflow-hidden z-50">
+              <div className="absolute right-0 mt-3 w-56 bg-dark-card border border-dark-border rounded-xl shadow-2xl overflow-hidden z-[9999]">
                 <div className="p-3 border-b border-dark-border">
                   <p className="text-xs text-gray-500 mb-1">Wallet Address</p>
                   <p className="text-sm text-white font-mono truncate">{address}</p>
@@ -143,7 +161,10 @@ export default function Navbar() {
             )}
           </div>
         ) : (
-          <button className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition">
+          <button
+            onClick={connect}
+            className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition"
+          >
             Connect Wallet
           </button>
         )}

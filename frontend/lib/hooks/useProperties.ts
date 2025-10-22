@@ -176,32 +176,119 @@ export function useUserHoldings(propertyContract: string, userAddress?: string) 
 }
 
 /**
+ * Fetch all properties where user has shares
+ */
+export function useUserPortfolio(userAddress?: string) {
+  const { data: allProperties } = useProperties();
+
+  return useQuery({
+    queryKey: ['user-portfolio', userAddress],
+    queryFn: async () => {
+      if (!userAddress || !allProperties) return [];
+
+      const portfolio = [];
+
+      for (const property of allProperties) {
+        try {
+          const [contractAddress, contractName] = [property.contractAddress, property.contractName];
+
+          // Get user balance
+          const balanceResult = await callReadOnlyFunction(
+            contractAddress,
+            contractName,
+            'get-balance',
+            [principalCV(userAddress)]
+          );
+
+          const shares = parseInt(balanceResult?.value?.value || '0');
+
+          if (shares > 0) {
+            // Get property info
+            const infoResult = await callReadOnlyFunction(
+              contractAddress,
+              contractName,
+              'get-property-info'
+            );
+
+            const sharePrice = parseInt(infoResult?.value?.value?.['share-price']?.value || '0') / 1000000;
+            const invested = shares * sharePrice;
+
+            // Get current payout round
+            const roundResult = await callReadOnlyFunction(
+              contractAddress,
+              contractName,
+              'get-current-round'
+            );
+
+            const currentRound = parseInt(roundResult?.value?.value || '0');
+
+            // Check if user has unclaimed payouts
+            let claimableAmount = 0;
+            if (currentRound > 0) {
+              const claimableResult = await callReadOnlyFunction(
+                contractAddress,
+                contractName,
+                'calculate-claimable',
+                [uintCV(currentRound), principalCV(userAddress)]
+              );
+
+              const alreadyClaimed = claimableResult?.value?.value?.['already-claimed']?.value === true;
+              if (!alreadyClaimed) {
+                claimableAmount = parseInt(claimableResult?.value?.value?.claimable?.value || '0') / 1000000;
+              }
+            }
+
+            portfolio.push({
+              ...property,
+              sharesOwned: shares,
+              invested,
+              currentValue: invested * 1.1, // Rough estimate, would need price oracle
+              currentRound,
+              claimableAmount,
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching holdings for property ${property.id}:`, error);
+        }
+      }
+
+      return portfolio;
+    },
+    enabled: !!userAddress && !!allProperties,
+    refetchInterval: 30000,
+  });
+}
+
+/**
  * Parse property data from contract response
  */
 function parsePropertyData(id: number, data: any): Property | null {
   try {
-    // Extract data from the contract response
-    // The structure depends on how your contract returns data
-    const contractId = data.contract?.value || '';
-    const [contractAddress, contractName] = contractId.split('.');
+    // The data structure from our property-factory contract:
+    // contract-address, name, symbol, owner, total-shares, created-at, status, location
+
+    const contractAddressFull = data['contract-address']?.value || '';
+    const [contractAddress, contractName] = contractAddressFull.includes('.')
+      ? contractAddressFull.split('.')
+      : [contractAddressFull, ''];
 
     return {
       id: id.toString(),
-      contractAddress,
-      contractName,
+      contractAddress: contractAddress || 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+      contractName: contractName || `property-${id}`,
       name: data.name?.value || `Property #${id}`,
       location: data.location?.value || 'Unknown Location',
-      description: data.description?.value || '',
-      imageUrl: data.imageUrl?.value || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-      sharePrice: parseInt(data.sharePrice?.value || '0') / 1000000, // Convert from micro-STX to STX
-      totalShares: parseInt(data.totalShares?.value || '0'),
-      soldShares: parseInt(data.soldShares?.value || '0'),
-      roi: parseFloat(data.roi?.value || '0'),
-      status: data.status?.value || 'active',
-      estimatedAnnualReturn: parseFloat(data.estimatedReturn?.value || '0'),
-      propertyValue: parseInt(data.propertyValue?.value || '0'),
-      lastPayoutDate: data.lastPayoutDate?.value,
-      nextPayoutDate: data.nextPayoutDate?.value,
+      description: `Fractional ownership of ${data.name?.value || 'property'} in ${data.location?.value || 'location'}`,
+      imageUrl: `https://images.unsplash.com/photo-${['1545324418-cc1a3fa10c00', '1512917774080-9991f1c4c750', '1564013799919-ab600027ffc6'][id % 3]}`,
+      sharePrice: 0.025, // Will be fetched from property contract
+      totalShares: parseInt(data['total-shares']?.value || '1000'),
+      soldShares: 0, // Will be fetched from property contract
+      roi: 8.5, // Default ROI, will be calculated from payouts
+      status: (data.status?.value || 'active') as 'active' | 'sold-out' | 'upcoming',
+      estimatedAnnualReturn: 8.5,
+      propertyValue: parseInt(data['total-shares']?.value || '1000') * 500, // Estimated
+      lastPayoutDate: undefined,
+      nextPayoutDate: undefined,
     };
   } catch (error) {
     console.error('Error parsing property data:', error);

@@ -11,6 +11,12 @@ contracts/coverage/
 contracts/costs-reports.json
 .cache/
 
+# Protect private keys (mnemonics)
+contracts/settings/Testnet.toml
+contracts/settings/Mainnet.toml
+**/settings/Testnet.toml
+**/settings/Mainnet.toml
+
 # Frontend
 frontend/.next/
 frontend/out/

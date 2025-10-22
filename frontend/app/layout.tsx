@@ -10,9 +10,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html className="dark">
-      <body>{children}</body>
-    </html>
-  );
+  // Just return children - the locale layout handles the HTML structure
+  return children;
 }
