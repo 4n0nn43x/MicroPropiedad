@@ -24,6 +24,7 @@ export interface Property {
   status: 'active' | 'sold-out' | 'upcoming';
   estimatedAnnualReturn: number;
   propertyValue: number;
+  minPurchase: number;
   lastPayoutDate?: string;
   nextPayoutDate?: string;
   // Additional metadata from IPFS
@@ -545,6 +546,7 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
       status: (contractStatus || 'active') as 'active' | 'sold-out' | 'upcoming',
       estimatedAnnualReturn: roi,
       propertyValue,
+      minPurchase: metadata?.financials?.minPurchase || 1,
       details: metadata?.details,
       documents: metadata?.documents || [],
       metadataUri,

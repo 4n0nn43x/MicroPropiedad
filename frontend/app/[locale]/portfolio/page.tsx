@@ -102,7 +102,7 @@ export default function PortfolioPage() {
 
     try {
       await claimPayout(
-        `${investment.contractAddress}.${investment.contractName}`,
+        parseInt(investment.id),
         investment.currentRound,
         {
           onFinish: (data) => {

@@ -96,7 +96,7 @@ export default function TransactionsPage() {
       .filter(tx => tx.type === 'purchase')
       .reduce((sum, tx) => sum + tx.amount, 0),
     totalSold: transactions
-      .filter(tx => tx.type === 'sale')
+      .filter(tx => tx.type === 'transfer')
       .reduce((sum, tx) => sum + tx.amount, 0),
     totalPayouts: transactions
       .filter(tx => tx.type === 'payout')

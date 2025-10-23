@@ -234,7 +234,7 @@ export default function PropertyAnalyticsPage() {
               <div className="p-4 bg-dark-bg rounded-xl">
                 <p className="text-xs text-gray-500 mb-1">Average Purchase</p>
                 <p className="text-2xl font-bold text-white">
-                  {analytics?.totalInvestors > 0 ? formatNumber(property.soldShares / analytics.totalInvestors) : '0'} shares
+                  {analytics?.totalInvestors && analytics.totalInvestors > 0 ? formatNumber(property.soldShares / analytics.totalInvestors) : '0'} shares
                 </p>
               </div>
               <div className="p-4 bg-dark-bg rounded-xl">
