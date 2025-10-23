@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { ArrowUpRight, ArrowDownRight, ExternalLink, Filter, Search, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
+import { useTransactions } from '@/lib/hooks/useTransactions';
 
 export default function TransactionsPage() {
   const t = useTranslations('transactions');
-  const { connected, connect } = useWallet();
+  const { connected, address, connect } = useWallet();
+  const { data: transactions = [], isLoading } = useTransactions(address || undefined);
   const [filterType, setFilterType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,9 +32,17 @@ export default function TransactionsPage() {
     );
   }
 
-  // Transaction history will be indexed by backend
-  // For now, users can view transactions in Stacks Explorer
-  const transactions: any[] = [];
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading transactions...</p>
+        </div>
+      </div>
+    );
+  }
 
   const filteredTransactions = transactions.filter(tx => {
     const matchesType = filterType === 'all' || tx.type === filterType;
@@ -110,17 +120,17 @@ export default function TransactionsPage() {
 
         <div className="glass-card p-6">
           <p className="text-sm text-gray-400 mb-2">{t('stats.totalPurchased')}</p>
-          <p className="text-3xl font-bold text-white">${stats.totalPurchased.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-white">{stats.totalPurchased.toFixed(2)} STX</p>
         </div>
 
         <div className="glass-card p-6">
-          <p className="text-sm text-gray-400 mb-2">{t('stats.totalSold')}</p>
-          <p className="text-3xl font-bold text-accent-green">${stats.totalSold.toLocaleString()}</p>
+          <p className="text-sm text-gray-400 mb-2">Total Sold</p>
+          <p className="text-3xl font-bold text-accent-green">{stats.totalSold.toFixed(2)} STX</p>
         </div>
 
         <div className="glass-card p-6">
           <p className="text-sm text-gray-400 mb-2">{t('stats.totalPayouts')}</p>
-          <p className="text-3xl font-bold text-accent-purple">${stats.totalPayouts.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-accent-purple">{stats.totalPayouts.toFixed(2)} STX</p>
         </div>
       </div>
 
@@ -143,7 +153,6 @@ export default function TransactionsPage() {
           {[
             { value: 'all', label: t('filters.all') },
             { value: 'purchase', label: t('filters.purchase') },
-            { value: 'sale', label: t('filters.sale') },
             { value: 'payout', label: t('filters.payout') },
           ].map((filter) => (
             <button
@@ -199,7 +208,7 @@ export default function TransactionsPage() {
                 <p className={`font-medium ${
                   tx.type === 'purchase' ? 'text-red-400' : 'text-accent-green'
                 }`}>
-                  {tx.type === 'purchase' ? '-' : '+'} ${tx.amount.toLocaleString()}
+                  {tx.type === 'purchase' ? '-' : '+'}{tx.amount.toFixed(2)} STX
                 </p>
               </div>
 
@@ -209,7 +218,7 @@ export default function TransactionsPage() {
 
               <div className="flex items-center">
                 <button
-                  onClick={() => window.open(`https://explorer.hiro.so/txid/${tx.txHash}?chain=mainnet`, '_blank')}
+                  onClick={() => window.open(`https://explorer.hiro.so/txid/${tx.txHash}?chain=testnet`, '_blank')}
                   className="flex items-center gap-1.5 text-sm text-primary-400 hover:text-primary-300 transition"
                 >
                   <span className="font-mono">{tx.txHash.slice(0, 8)}...</span>
