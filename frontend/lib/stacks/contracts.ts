@@ -110,15 +110,99 @@ export const purchaseShares = async (
 };
 
 /**
- * Claim payout from a property
+ * Purchase shares in a property using sBTC (new!)
+ */
+export const purchaseSharesSBTC = async (
+  propertyId: number,
+  numShares: number,
+  sharePrice: number,
+  minPurchase: number = 1,
+  callbacks?: TransactionCallbacks
+) => {
+  console.log('\n💰 PURCHASE SHARES TRANSACTION (sBTC)');
+  console.log('🆔 Property ID:', propertyId);
+  console.log('📊 Number of shares:', numShares);
+  console.log('💵 Price per share:', sharePrice, 'STX');
+  console.log('🔢 Minimum purchase:', minPurchase);
+
+  // Validation
+  if (numShares < minPurchase) {
+    throw new Error(`Minimum purchase is ${minPurchase} shares`);
+  }
+
+  const PROPERTY_MULTI_CONTRACT = process.env.NEXT_PUBLIC_PROPERTY_MULTI_CONTRACT || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ.property-multi';
+  const [contractAddress, contractName] = PROPERTY_MULTI_CONTRACT.split('.');
+
+  console.log('🔍 Using property-multi contract:', {
+    contractAddress,
+    contractName,
+    propertyId,
+    currency: 'sBTC'
+  });
+
+  // Function args: property-id and num-shares
+  const functionArgs = [uintCV(propertyId), uintCV(numShares)];
+
+  // Calculate total cost in micro-STX (same price, different currency)
+  const totalCostSTX = sharePrice * numShares;
+  const totalCost = BigInt(Math.floor(totalCostSTX * 1000000));
+
+  console.log('💰 Total cost calculation:', {
+    sharePrice,
+    numShares,
+    totalSTX: totalCostSTX,
+    totalMicroSTX: totalCost.toString(),
+    currency: 'sBTC'
+  });
+
+  // Get user address
+  const userData = userSession.loadUserData();
+  const userAddress = network.isMainnet()
+    ? userData.profile.stxAddress.mainnet
+    : userData.profile.stxAddress.testnet;
+
+  console.log('👤 User address:', userAddress);
+
+  // Note: For sBTC, we would need to add post-conditions for sBTC token transfer
+  // For MVP, we'll use Allow mode
+  console.log('⚠️ Using Allow mode for sBTC (post-conditions to be implemented)');
+
+  return openContractCall({
+    contractAddress,
+    contractName,
+    functionName: 'purchase-shares-sbtc',
+    functionArgs,
+    network,
+    anchorMode: AnchorMode.Any,
+    postConditionMode: PostConditionMode.Allow, // TODO: Add sBTC post-conditions
+    onFinish: (data) => {
+      console.log('✅ sBTC Purchase transaction submitted:', data.txId);
+      console.log('🔗 View on explorer:', `https://explorer.stacks.co/txid/${data.txId}?chain=${network.isMainnet() ? 'mainnet' : 'testnet'}`);
+      callbacks?.onFinish?.(data);
+    },
+    onCancel: () => {
+      console.log('❌ sBTC Purchase transaction cancelled by user');
+      callbacks?.onCancel?.();
+    },
+  });
+};
+
+/**
+ * Claim payout from a property (updated for property-multi)
  */
 export const claimPayout = async (
-  propertyContract: string,
+  propertyId: number,
   roundId: number,
   callbacks?: TransactionCallbacks
 ) => {
-  const functionArgs = [uintCV(roundId)];
-  const [contractAddress, contractName] = propertyContract.split('.');
+  console.log('\n💰 CLAIM PAYOUT TRANSACTION');
+  console.log('🆔 Property ID:', propertyId);
+  console.log('🔄 Round ID:', roundId);
+
+  const PROPERTY_MULTI_CONTRACT = process.env.NEXT_PUBLIC_PROPERTY_MULTI_CONTRACT || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ.property-multi';
+  const [contractAddress, contractName] = PROPERTY_MULTI_CONTRACT.split('.');
+
+  const functionArgs = [uintCV(propertyId), uintCV(roundId)];
 
   return openContractCall({
     contractAddress,
@@ -129,11 +213,12 @@ export const claimPayout = async (
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Allow,
     onFinish: (data) => {
-      console.log('Claim transaction submitted:', data.txId);
+      console.log('✅ Claim transaction submitted:', data.txId);
+      console.log('🔗 View on explorer:', `https://explorer.stacks.co/txid/${data.txId}?chain=${network.isMainnet() ? 'mainnet' : 'testnet'}`);
       callbacks?.onFinish?.(data);
     },
     onCancel: () => {
-      console.log('Claim transaction cancelled');
+      console.log('❌ Claim transaction cancelled');
       callbacks?.onCancel?.();
     },
   });

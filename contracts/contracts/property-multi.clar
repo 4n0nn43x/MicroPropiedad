@@ -213,6 +213,78 @@
   )
 )
 
+;; Purchase shares in a property using sBTC
+(define-public (purchase-shares-sbtc (property-id uint) (num-shares uint))
+  (let
+    (
+      (property (unwrap! (map-get? properties property-id) ERR-PROPERTY-NOT-FOUND))
+      (buyer tx-sender)
+      (price-per-share (get share-price-micro-stx property))
+      (shares-sold (get shares-sold property))
+      (total-shares (get total-shares property))
+      (min-buy (get min-purchase property))
+      (remaining-shares (- total-shares shares-sold))
+      (cost (* num-shares price-per-share))
+    )
+    ;; Validations
+    (asserts! (not (var-get paused)) ERR-PAUSED)
+    (asserts! (get sale-active property) ERR-SALE-NOT-ACTIVE)
+    (asserts! (> num-shares u0) ERR-INVALID-AMOUNT)
+    (asserts! (>= num-shares min-buy) ERR-INVALID-AMOUNT)
+    (asserts! (<= num-shares remaining-shares) ERR-INSUFFICIENT-SHARES)
+    (asserts! (> cost u0) ERR-INVALID-AMOUNT)
+
+    ;; Transfer sBTC from buyer to property owner using contract-call
+    ;; Note: sBTC contract address on testnet needs to be configured
+    ;; For now, using a placeholder - replace with actual sBTC contract
+    (try! (contract-call?
+      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sbtc-token
+      transfer
+      cost
+      buyer
+      (get owner property)
+      none
+    ))
+
+    ;; Update buyer's balance
+    (let
+      (
+        (current-balance (default-to u0 (map-get? share-balances { property-id: property-id, holder: buyer })))
+      )
+      (map-set share-balances
+        { property-id: property-id, holder: buyer }
+        (+ current-balance num-shares)
+      )
+    )
+
+    ;; Update property stats
+    (map-set properties property-id
+      (merge property { shares-sold: (+ shares-sold num-shares) })
+    )
+
+    ;; Update supply
+    (let
+      (
+        (current-supply (default-to u0 (map-get? property-supply property-id)))
+      )
+      (map-set property-supply property-id (+ current-supply num-shares))
+    )
+
+    (print {
+      event: "purchase-shares-sbtc",
+      property-id: property-id,
+      buyer: buyer,
+      num-shares: num-shares,
+      price-per-share: price-per-share,
+      total-cost: cost,
+      currency: "sBTC",
+      remaining-shares: (- remaining-shares num-shares)
+    })
+
+    (ok num-shares)
+  )
+)
+
 ;; Distribute payout to shareholders (owner only)
 (define-public (distribute-payout (property-id uint) (amount uint))
   (let

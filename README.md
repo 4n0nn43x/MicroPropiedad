@@ -1,297 +1,302 @@
-# 🏗 MicroPropiedad BTC
+# 🏠 MicroPropiedad - Fractional Real Estate Ownership on Bitcoin L2
 
-> **Fractional Real Estate Tokenization Platform on Stacks & sBTC**
+> **Stacks Latam Hackathon 2025** | Category: Real World Asset (RWA) Tokenization
 
-Invest in real estate with Bitcoin. Own fractions of properties, earn passive income, and trade shares — all on the blockchain.
+[![Stacks](https://img.shields.io/badge/Built%20on-Stacks-5546FF)](https://www.stacks.co/)
+[![sBTC](https://img.shields.io/badge/Powered%20by-sBTC-F7931A)](https://www.stacks.co/sbtc)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-[![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen)]()
-[![Stacks](https://img.shields.io/badge/Stacks-Testnet-purple)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
+## 🎯 Problem Statement
 
-## 🎯 The Problem (LATAM & Global)
+**Access to real estate investment in Latin America is broken:**
 
-- 🚫 Real estate is the safest investment but **inaccessible** (huge capital required)
-- 💸 Inflation destroys savings (especially in Argentina, Venezuela, etc.)
-- 🔒 No access to premium investments for young people / freelancers
-- 📊 No transparent co-ownership systems
-- 🌍 Investing abroad = complicated legal procedures
+- 🚫 High entry barriers: minimum investments of $50,000+
+- 📉 Illiquid assets: impossible to sell partial ownership
+- 🏦 Opaque processes: hidden fees and complex legal structures
+- 💼 Limited opportunities: only wealthy investors can participate
+- 🌎 Geographic barriers: can't invest in properties outside your city
 
-## ✨ The Solution
+**Result**: 90% of Latin Americans are excluded from real estate investment opportunities.
 
-**MicroPropiedad BTC** allows anyone to:
+## 💡 Solution
 
-1. 🏠 **Buy fractions** of real estate with sBTC
-2. 💰 **Earn passive income** from rental revenue (automatic distribution)
-3. 📈 **Trade shares** on secondary marketplace (instant liquidity)
-4. 🗳️ **Participate in governance** (DAO-like property decisions)
+**MicroPropiedad** democratizes real estate investment through fractional ownership on Bitcoin's Layer 2 (Stacks):
 
-## 🚀 Quick Start
-
-```bash
-# 1. Install dependencies
-npm run install:all
-
-# 2. Test smart contracts (65 tests)
-npm run test:contracts
-
-# 3. Run frontend
-npm run dev:frontend
-
-# 4. Run backend (optional)
-npm run dev:backend
-```
-
-**See [QUICK_START.md](./QUICK_START.md) for detailed setup instructions.**
-
-## 📋 Recent Fixes & Features
-
-✅ **Language Selector (ES/EN)** - Visible in navbar
-✅ **Wallet Connection** - Working properly with Stacks wallets
-✅ **UI/UX Fixes** - Dropdown z-index, responsive design
-✅ **Marketplace** - Real estate content (removed NFT placeholders)
-✅ **Smart Contract Integration** - Frontend fetches from blockchain
-✅ **Backend API** - Express server + Oracle service
-✅ **All Tests Passing** - 65/65 contract tests ✓
-
-## 🏗 Architecture
-
-```
-┌─────────────────┐
-│   Frontend      │  Next.js + React + Stacks.js
-│   (dApp)        │  - Marketplace, Portfolio, Governance
-└────────┬────────┘
-         │
-         ├─────────────────┐
-         │                 │
-┌────────▼────────┐ ┌─────▼──────────┐
-│ Smart Contracts │ │ Backend API    │
-│ (Clarity)       │ │ + Oracle       │
-│ - PropertyFactory│ │ - API Server   │
-│ - Property (FT) │ │ - Payout Oracle│
-└─────────────────┘ └────────────────┘
-         │
-┌────────▼────────┐
-│ Stacks Testnet  │
-│ (Bitcoin L2)    │
-└─────────────────┘
-```
-
-## 💻 Tech Stack
-
-### Smart Contracts
-- **Clarity** - Bitcoin-secured smart contracts
-- **Stacks** - Bitcoin Layer 2
-- **sBTC** - 1:1 Bitcoin-backed asset
-- **Clarinet** - Development & testing
-
-### Frontend
-- **Next.js 14** - App Router
-- **React** - UI components
-- **TypeScript** - Type safety
-- **Stacks.js** - Blockchain integration
-- **TailwindCSS** - Styling
-
-### Backend
-- **Node.js** - Runtime
-- **Express** - API server
-- **Oracle Service** - Off-chain data verification
-
-## 📁 Project Structure
-
-```
-MicroPropiedad/
-├── contracts/              # Smart contracts (Clarity)
-│   ├── contracts/
-│   │   ├── property-factory.clar   # Registry & factory
-│   │   ├── property.clar           # Fractional token (SIP-010)
-│   │   └── sip010-ft-trait.clar   # Token standard
-│   ├── tests/              # 65 passing tests
-│   └── deployments/        # Testnet/Mainnet configs
-│
-├── frontend/               # Next.js dApp
-│   ├── app/               # Pages (locale-based routing)
-│   ├── components/        # React components
-│   │   ├── wallet/       # Wallet connection
-│   │   ├── layout/       # Navbar, sidebar
-│   │   └── property/     # Property cards
-│   ├── lib/
-│   │   ├── hooks/        # useProperties, useWallet
-│   │   └── stacks/       # Smart contract integration
-│   └── public/
-│
-├── backend/               # API & Oracle
-│   ├── src/
-│   │   ├── index.js      # Express API
-│   │   └── oracle/       # Revenue distribution oracle
-│   └── api/              # Future modules
-│
-└── docs/                 # Documentation
-    ├── QUICK_START.md    # Get started quickly
-    └── DEPLOYMENT_GUIDE.md  # Detailed deployment
-```
-
-## 🎮 How It Works
-
-### For Investors
-
-1. **Connect Wallet** (Hiro, Leather, Xverse)
-2. **Browse Properties** on marketplace
-3. **Purchase Shares** with sBTC or STX
-4. **Earn Revenue** from rental income (auto-distributed)
-5. **Trade Shares** on secondary marketplace
-6. **Vote** on property decisions (renovations, sales, etc.)
-
-### For Property Owners
-
-1. **List Property** with details
-2. **Tokenize** into fractional shares
-3. **Raise Funds** from investors
-4. **Submit Revenue** proofs monthly
-5. **Automatic Distribution** to shareholders
-
-### Smart Contract Flow
-
-```
-PropertyFactory.register-property()
-    ↓
-Creates Property Contract (SIP-010 FT)
-    ↓
-Investors purchase-shares()
-    ↓
-Owner submits revenue proof
-    ↓
-Oracle verifies → distribute-payout()
-    ↓
-Shareholders claim-payout()
-```
-
-## 🧪 Testing
-
-### Run All Tests
-```bash
-npm run test:contracts
-```
-
-**Expected output:**
-```
-✓ tests/property-factory.test.ts (23 tests)
-✓ tests/property.test.ts (41 tests)
-✓ tests/sip010-ft-trait.test.ts (1 test)
-
-Test Files  3 passed (3)
-Tests  65 passed (65)
-```
-
-### Test Coverage
-- ✅ Property registration
-- ✅ Share purchases
-- ✅ Revenue distribution
-- ✅ Payout claims
-- ✅ Governance votes
-- ✅ Access control
-- ✅ SIP-010 compliance
-
-## 🌐 Deployment
-
-### Testnet (Current)
-```bash
-npm run deploy:testnet
-```
-
-### Mainnet (Production)
-```bash
-npm run deploy:mainnet
-```
-
-See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed instructions.
-
-## 🔐 Security
-
-⚠️ **This is a hackathon prototype**
-
-For production deployment:
-- [ ] Professional security audit
-- [ ] Legal compliance (tokenization laws)
-- [ ] KYC/AML integration
-- [ ] Insurance mechanisms
-- [ ] Multi-sig wallets
-- [ ] Emergency pause functionality
-
-## 🚧 Roadmap
-
-### Phase 1 (Current - MVP)
-- [x] Smart contracts (Factory + Property)
-- [x] Frontend dApp
-- [x] Wallet integration
-- [x] Marketplace UI
-- [x] Backend API structure
-
-### Phase 2 (Next)
-- [ ] Deploy to testnet
-- [ ] Real property tokenization
-- [ ] KYC integration
-- [ ] Legal structure (SPV)
-- [ ] Oracle automation
-
-### Phase 3 (Future)
-- [ ] Mainnet deployment
-- [ ] Secondary marketplace
-- [ ] Governance DAO
-- [ ] Mobile app
-- [ ] Multi-language support
-- [ ] Integration with DeFi protocols
-
-## 💡 Use Cases
-
-1. **Residential Properties** - Apartments, houses
-2. **Commercial Real Estate** - Offices, retail
-3. **Vacation Rentals** - Airbnb, hotels
-4. **Land Development** - Pre-construction investment
-5. **Co-working Spaces** - Shared office ownership
-
-## 🌍 Target Markets
-
-- 🇦🇷 Argentina (high inflation, real estate demand)
-- 🇲🇽 Mexico (growing crypto adoption)
-- 🇨🇴 Colombia (emerging market)
-- 🇨🇱 Chile (stable economy)
-- 🇺🇾 Uruguay (crypto-friendly regulations)
-
-## 📚 Documentation
-
-- [Quick Start Guide](./QUICK_START.md) - Get up and running
-- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Deploy to testnet/mainnet
-- [Backend README](./backend/README.md) - API & Oracle docs
-- [Stacks Documentation](https://docs.stacks.co)
-
-## 🤝 Contributing
-
-This is a hackathon project. Contributions welcome!
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
-
-## 📄 License
-
-MIT License - see [LICENSE](./LICENSE) file
-
-## 🙏 Acknowledgments
-
-- **Stacks Foundation** - For the amazing Bitcoin L2
-- **Hiro** - Development tools (Clarinet, API)
-- **Bitcoin** - The foundation of everything
-
-## 📞 Support
-
-- **Documentation**: [QUICK_START.md](./QUICK_START.md)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/micropropiedad-btc/issues)
-- **Stacks Discord**: [Join Here](https://discord.gg/stacks)
+✅ **Invest from $10**: Buy fractional shares of properties using **sBTC** or **STX**
+✅ **Instant liquidity**: Trade shares 24/7 on secondary marketplace
+✅ **Transparent**: All transactions recorded on Bitcoin blockchain
+✅ **Automated payouts**: Receive rental income proportionally via smart contracts
+✅ **Global access**: Invest in LATAM properties from anywhere
 
 ---
 
-**Built with ❤️ for the Stacks x Bitcoin Hackathon**
+## 🏗️ Architecture
 
-🚀 **[Get Started](./QUICK_START.md)** | 📖 **[Read Docs](./DEPLOYMENT_GUIDE.md)** | 🌐 **[Live Demo](#)** (Coming Soon)
+```
+┌─────────────────┐
+│   Bitcoin L1    │ ← 100% Finality
+└────────┬────────┘
+         │
+┌────────▼────────┐
+│   Stacks L2     │ ← Smart Contracts (Clarity)
+│   ┌─────────┐   │
+│   │ sBTC 1:1│   │ ← Backed by real BTC
+│   └─────────┘   │
+│                 │
+│  ┌────────────┐ │
+│  │ Property   │ │ ← Fractional ownership tokens
+│  │   Multi    │ │
+│  └────────────┘ │
+│                 │
+│  ┌────────────┐ │
+│  │  Factory   │ │ ← Property creation
+│  │    V2      │ │
+│  └────────────┘ │
+└─────────────────┘
+         │
+┌────────▼────────┐
+│   Frontend      │ ← React/Next.js dApp
+│   - Marketplace │
+│   - Portfolio   │
+│   - Claim       │
+└─────────────────┘
+```
+
+### Key Components
+
+1. **Smart Contracts** (Clarity on Stacks Testnet):
+   - `property-multi.clar`: Manages multiple properties with unique IDs
+   - `property-factory-v2.clar`: Creates and registers new properties
+   - Deployed on: `STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ`
+
+2. **Frontend** (Next.js 14 + React):
+   - Property marketplace
+   - Purchase shares (STX & sBTC support)
+   - Portfolio dashboard
+   - Dividend claiming system
+   - Admin property creation
+
+3. **IPFS Storage** (Pinata):
+   - Property metadata (images, documents, descriptions)
+   - Decentralized and immutable
+
+---
+
+## ✨ Key Features
+
+### For Investors
+
+- 🛒 **Buy Fractional Shares**: Purchase as little as 1 share of a property
+- 💰 **Earn Passive Income**: Receive proportional rental payouts in STX/sBTC
+- 📊 **Track Portfolio**: Real-time dashboard of your investments
+- 🔄 **Trade Anytime**: Secondary marketplace for liquidity
+- 🔐 **Secure**: Non-custodial, you control your keys
+
+### For Property Owners
+
+- 🏢 **Tokenize Property**: Convert real estate into fractional shares
+- 💵 **Raise Capital**: Access to global pool of investors
+- 🤖 **Automated Payouts**: Smart contract handles dividend distribution
+- 📈 **Set Parameters**: Flexible min purchase, price per share, total shares
+- 📄 **IPFS Documentation**: Upload property docs, images, legal papers
+
+### Technical Highlights
+
+- ✅ **Dual Currency**: Support for both **STX** and **sBTC** payments
+- ✅ **Pull Pattern**: Gas-efficient payout claiming system
+- ✅ **Multi-Property**: Single contract manages unlimited properties
+- ✅ **Property-ID Based**: Each property has unique on-chain identifier
+- ✅ **Metadata Rich**: Full property details on IPFS
+- ✅ **Real-time Updates**: Event-driven architecture
+
+---
+
+## 📦 Installation & Setup
+
+### Prerequisites
+
+- Node.js 18+
+- Clarinet CLI
+- Hiro Wallet or Leather Wallet
+- Testnet STX tokens (get from [faucet](https://explorer.hiro.so/sandbox/faucet))
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/MicroPropiedad.git
+cd MicroPropiedad
+
+# Install dependencies (frontend)
+cd frontend
+npm install
+
+# Setup environment
+cp .env.example .env.local
+# Edit .env.local with your Pinata JWT and contract addresses
+
+# Run frontend
+npm run dev
+# Open http://localhost:3000
+```
+
+### Deploy Contracts (Optional)
+
+```bash
+cd contracts
+
+# Check contracts
+clarinet check
+
+# Deploy to testnet
+clarinet deployments apply -p deployments/default.testnet-plan-v2.yaml
+```
+
+Full setup guide: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+
+---
+
+## 💎 Smart Contract API
+
+### Property Creation
+
+```clarity
+(define-public (create-property
+  (name (string-ascii 32))
+  (symbol (string-ascii 10))
+  (uri (optional (string-utf8 256)))
+  (total uint)
+  (price-micro-stx uint)
+  (min-buy uint)
+  (addr (string-utf8 256))
+  (owner principal)
+))
+```
+
+### Purchase Shares (STX)
+
+```clarity
+(define-public (purchase-shares
+  (property-id uint)
+  (num-shares uint)
+))
+```
+
+### Purchase Shares (sBTC)
+
+```clarity
+(define-public (purchase-shares-sbtc
+  (property-id uint)
+  (num-shares uint)
+))
+```
+
+### Claim Payouts
+
+```clarity
+(define-public (claim-payout
+  (property-id uint)
+  (round-id uint)
+))
+```
+
+---
+
+## 📊 Business Model
+
+### Revenue Streams
+
+1. **Property Listing Fee**: 2% of total property value (one-time)
+2. **Transaction Fees**: 1.5% on marketplace trades
+3. **Payout Distribution Fee**: 0.5% on rental distributions
+
+### Projections (Year 1)
+
+- **50 properties** tokenized
+- **$2M total** property value
+- **1,000 investors**
+- **$40,000 revenue**
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Blockchain** | Stacks (Bitcoin L2) |
+| **Smart Contracts** | Clarity |
+| **Payments** | sBTC (1:1 Bitcoin) + STX |
+| **Frontend** | Next.js 14, React, TypeScript |
+| **Styling** | Tailwind CSS |
+| **Wallet** | Hiro Wallet, Leather |
+| **Storage** | IPFS (Pinata) |
+| **API** | Hiro Stacks API |
+| **i18n** | next-intl (EN/ES/FR) |
+
+---
+
+## 🎯 Roadmap
+
+### ✅ Phase 1: MVP (Current - Hackathon)
+- [x] Multi-property smart contract architecture
+- [x] Property creation & marketplace
+- [x] Share purchase (STX + sBTC)
+- [x] Payout distribution & claiming
+- [x] IPFS metadata storage
+- [x] Responsive frontend
+
+### 🔄 Phase 2: Post-Hackathon (Q4 2025)
+- [ ] Legal framework (SPV structure)
+- [ ] KYC/AML integration
+- [ ] Smart contract audit
+- [ ] Mainnet deployment
+- [ ] First real property tokenization
+
+### 🚀 Phase 3: Scale (2026)
+- [ ] Partnership with real estate agencies in LATAM
+- [ ] Mobile app (iOS/Android)
+- [ ] Advanced governance (DAO voting)
+- [ ] Cross-chain bridges
+
+---
+
+## 📚 Documentation
+
+- [Deployment Guide](./DEPLOYMENT_GUIDE.md)
+- [Quick Start](./QUICK_START.md)
+- [Smart Contract API](./docs/SMART_CONTRACT_API.md)
+- [Architecture](./docs/architecture/README.md)
+- [Business Model](./docs/BUSINESS_MODEL.md)
+
+---
+
+## 🔐 Security
+
+- ✅ Non-custodial: Users control private keys
+- ✅ Pull payment pattern (reentrancy protection)
+- ✅ Owner authorization checks
+- ✅ Pausable emergency circuit breaker
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+## 🚀 Built for Stacks Latam Hackathon 2025
+
+**Category**: Real World Asset (RWA) Tokenization
+**Technologies**: Stacks, sBTC, Clarity, Bitcoin L2
+**Impact**: Democratizing real estate investment in Latin America
+
+---
+
+<div align="center">
+
+**🏠 Making Real Estate Investment Accessible to Everyone 🌎**
+
+[Documentation](./docs/) • [Smart Contracts](./contracts/)
+
+</div>
