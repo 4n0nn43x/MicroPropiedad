@@ -68,7 +68,7 @@
   },
   "landing": {
     "hero": {
-      "title": "Invierte en Bienes Raíces con Bitcoin",
+      "title": "Invierte en Bienes Raíces en la Blockchain",
       "subtitle": "Propiedad fraccionada en blockchain Stacks. Comienza a invertir desde $10.",
       "cta": "Comenzar a Invertir"
     },
@@ -99,7 +99,7 @@
       },
       "step3": {
         "title": "Compra Acciones",
-        "description": "Adquiere propiedad fraccionada con sBTC o STX"
+        "description": "Adquiere propiedad fraccionada con STX"
       },
       "step4": {
         "title": "Gana Retornos",
@@ -547,8 +547,8 @@
     "title": "Mercado de Propiedades",
     "subtitle": "Explora oportunidades de bienes raíces tokenizados",
     "hero": {
-      "title": "Invierte en Bienes Raíces con Bitcoin",
-      "subtitle": "Propiedad fraccionada impulsada por Stacks & sBTC",
+      "title": "Invierte en Bienes Raíces en la Blockchain",
+      "subtitle": "Propiedad fraccionada impulsada por la blockchain de Stacks",
       "exploreButton": "Explorar Propiedades",
       "listButton": "Lista Tu Propiedad"
     },

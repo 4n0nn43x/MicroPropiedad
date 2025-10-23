@@ -1,9 +1,9 @@
-# 🏠 MicroPropiedad - Fractional Real Estate Ownership on Bitcoin L2
+# 🏠 MicroPropiedad - Fractional Real Estate Ownership on Stacks Blockchain
 
 > **Stacks Latam Hackathon 2025** | Category: Real World Asset (RWA) Tokenization
 
 [![Stacks](https://img.shields.io/badge/Built%20on-Stacks-5546FF)](https://www.stacks.co/)
-[![sBTC](https://img.shields.io/badge/Powered%20by-sBTC-F7931A)](https://www.stacks.co/sbtc)
+[![STX](https://img.shields.io/badge/Powered%20by-STX-5546FF)](https://www.stacks.co/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## 🎯 Problem Statement
@@ -20,11 +20,11 @@
 
 ## 💡 Solution
 
-**MicroPropiedad** democratizes real estate investment through fractional ownership on Bitcoin's Layer 2 (Stacks):
+**MicroPropiedad** democratizes real estate investment through fractional ownership on Stacks blockchain:
 
-✅ **Invest from $10**: Buy fractional shares of properties using **sBTC** or **STX**
+✅ **Invest from $10**: Buy fractional shares of properties using **STX**
 ✅ **Instant liquidity**: Trade shares 24/7 on secondary marketplace
-✅ **Transparent**: All transactions recorded on Bitcoin blockchain
+✅ **Transparent**: All transactions recorded on blockchain with Bitcoin-level security
 ✅ **Automated payouts**: Receive rental income proportionally via smart contracts
 ✅ **Global access**: Invest in LATAM properties from anywhere
 
@@ -34,14 +34,11 @@
 
 ```
 ┌─────────────────┐
-│   Bitcoin L1    │ ← 100% Finality
+│   Bitcoin L1    │ ← Security Layer
 └────────┬────────┘
          │
 ┌────────▼────────┐
 │   Stacks L2     │ ← Smart Contracts (Clarity)
-│   ┌─────────┐   │
-│   │ sBTC 1:1│   │ ← Backed by real BTC
-│   └─────────┘   │
 │                 │
 │  ┌────────────┐ │
 │  │ Property   │ │ ← Fractional ownership tokens
@@ -71,7 +68,7 @@
 
 2. **Frontend** (Next.js 14 + React):
    - Property marketplace
-   - Purchase shares (STX & sBTC support)
+   - Purchase shares (STX)
    - Portfolio dashboard
    - Dividend claiming system
    - Admin property creation
@@ -87,7 +84,7 @@
 ### For Investors
 
 - 🛒 **Buy Fractional Shares**: Purchase as little as 1 share of a property
-- 💰 **Earn Passive Income**: Receive proportional rental payouts in STX/sBTC
+- 💰 **Earn Passive Income**: Receive proportional rental payouts in STX
 - 📊 **Track Portfolio**: Real-time dashboard of your investments
 - 🔄 **Trade Anytime**: Secondary marketplace for liquidity
 - 🔐 **Secure**: Non-custodial, you control your keys
@@ -102,7 +99,7 @@
 
 ### Technical Highlights
 
-- ✅ **Dual Currency**: Support for both **STX** and **sBTC** payments
+- ✅ **STX Payments**: Native Stacks token for all transactions
 - ✅ **Pull Pattern**: Gas-efficient payout claiming system
 - ✅ **Multi-Property**: Single contract manages unlimited properties
 - ✅ **Property-ID Based**: Each property has unique on-chain identifier
@@ -124,7 +121,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/MicroPropiedad.git
+git clone https://github.com/4n0nn43x/MicroPropiedad.git
 cd MicroPropiedad
 
 # Install dependencies (frontend)
@@ -182,15 +179,6 @@ Full setup guide: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 ))
 ```
 
-### Purchase Shares (sBTC)
-
-```clarity
-(define-public (purchase-shares-sbtc
-  (property-id uint)
-  (num-shares uint)
-))
-```
-
 ### Claim Payouts
 
 ```clarity
@@ -223,15 +211,15 @@ Full setup guide: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 | Layer | Technology |
 |-------|-----------|
-| **Blockchain** | Stacks (Bitcoin L2) |
+| **Blockchain** | Stacks (Bitcoin-secured L2) |
 | **Smart Contracts** | Clarity |
-| **Payments** | sBTC (1:1 Bitcoin) + STX |
+| **Payments** | STX (Stacks native token) |
 | **Frontend** | Next.js 14, React, TypeScript |
 | **Styling** | Tailwind CSS |
 | **Wallet** | Hiro Wallet, Leather |
 | **Storage** | IPFS (Pinata) |
 | **API** | Hiro Stacks API |
-| **i18n** | next-intl (EN/ES/FR) |
+| **i18n** | next-intl (EN/ES) |
 
 ---
 
@@ -240,7 +228,7 @@ Full setup guide: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 ### ✅ Phase 1: MVP (Current - Hackathon)
 - [x] Multi-property smart contract architecture
 - [x] Property creation & marketplace
-- [x] Share purchase (STX + sBTC)
+- [x] Share purchase (STX)
 - [x] Payout distribution & claiming
 - [x] IPFS metadata storage
 - [x] Responsive frontend
@@ -288,7 +276,7 @@ MIT License
 ## 🚀 Built for Stacks Latam Hackathon 2025
 
 **Category**: Real World Asset (RWA) Tokenization
-**Technologies**: Stacks, sBTC, Clarity, Bitcoin L2
+**Technologies**: Stacks, STX, Clarity, Bitcoin-secured blockchain
 **Impact**: Democratizing real estate investment in Latin America
 
 ---

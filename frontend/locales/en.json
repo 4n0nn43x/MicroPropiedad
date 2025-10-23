@@ -68,7 +68,7 @@
   },
   "landing": {
     "hero": {
-      "title": "Invest in Real Estate with Bitcoin",
+      "title": "Invest in Real Estate on the Blockchain",
       "subtitle": "Fractional property ownership on Stacks blockchain. Start investing from $10.",
       "cta": "Start Investing"
     },
@@ -99,7 +99,7 @@
       },
       "step3": {
         "title": "Buy Shares",
-        "description": "Purchase fractional ownership with sBTC or STX"
+        "description": "Purchase fractional ownership with STX"
       },
       "step4": {
         "title": "Earn Returns",
@@ -547,8 +547,8 @@
     "title": "Property Marketplace",
     "subtitle": "Browse tokenized real estate opportunities",
     "hero": {
-      "title": "Invest in Real Estate with Bitcoin",
-      "subtitle": "Fractional property ownership powered by Stacks & sBTC",
+      "title": "Invest in Real Estate on the Blockchain",
+      "subtitle": "Fractional property ownership powered by Stacks blockchain",
       "exploreButton": "Explore Properties",
       "listButton": "List Your Property"
     },
