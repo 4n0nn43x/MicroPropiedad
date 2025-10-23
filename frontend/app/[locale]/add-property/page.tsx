@@ -31,6 +31,7 @@ export default function AddPropertyPage() {
     totalShares: '',
     pricePerShare: '',
     expectedReturn: '',
+    minPurchase: '1', // Minimum shares to purchase
 
     // Step 3: Property Details
     bedrooms: '',
@@ -90,6 +91,18 @@ export default function AddPropertyPage() {
       return;
     }
 
+    // Validate minPurchase
+    const minPurchase = Number(formData.minPurchase) || 1;
+    const totalShares = Number(formData.totalShares);
+    if (minPurchase < 1) {
+      alert('Minimum purchase must be at least 1 share');
+      return;
+    }
+    if (minPurchase > totalShares) {
+      alert('Minimum purchase cannot exceed total shares');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -133,20 +146,16 @@ export default function AddPropertyPage() {
         .toUpperCase()
         .substring(0, 10) || 'PROP';
 
-      // Step 4: For now, use a placeholder contract address
-      // TODO: In production, we should deploy a new property contract for each property
-      const placeholderContractAddress = process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ';
-      const propertyContractAddress = `${placeholderContractAddress}.property-${Date.now()}`;
-
       console.log(t('alerts.registering'));
 
-      // Step 5: Register property with the factory contract
+      // Step 4: Register property with the factory contract (now using property-multi architecture)
       await registerProperty({
-        contractAddress: propertyContractAddress,
         name: formData.name,
         symbol: symbol,
         location: formData.location,
         totalShares: Number(formData.totalShares),
+        sharePrice: sharePrice,
+        minPurchase: Number(formData.minPurchase) || 1,
         metadataUri: metadataResult.url,
       }, {
         onFinish: (data) => {
@@ -366,9 +375,32 @@ export default function AddPropertyPage() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Minimum Purchase (shares) *
+              </label>
+              <input
+                type="number"
+                min="1"
+                max={formData.totalShares || undefined}
+                value={formData.minPurchase}
+                onChange={(e) => handleInputChange('minPurchase', e.target.value)}
+                placeholder="e.g., 1"
+                className="w-full px-4 py-3 bg-dark-card border border-dark-border rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition"
+              />
+              <p className="mt-2 text-xs text-gray-400">
+                💡 Set the minimum number of shares an investor must purchase at once. Lower values make it more accessible.
+              </p>
+              {formData.minPurchase && formData.pricePerShare && (
+                <p className="mt-1 text-xs text-primary-400">
+                  Minimum investment: ${(Number(formData.minPurchase) * Number(formData.pricePerShare)).toFixed(2)} STX
+                </p>
+              )}
+            </div>
+
             <div className="glass-card p-4 bg-primary-500/5 border border-primary-500/20">
               <h3 className="text-sm font-medium text-primary-400 mb-2">{t('step2.summary.title')}</h3>
-              <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">{t('step2.summary.totalValue')}</p>
                   <p className="text-white font-medium">${Number(formData.totalValue || 0).toLocaleString()}</p>
@@ -380,6 +412,10 @@ export default function AddPropertyPage() {
                 <div>
                   <p className="text-gray-500">{t('step2.summary.totalShares')}</p>
                   <p className="text-white font-medium">{formData.totalShares || '0'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Min. Purchase</p>
+                  <p className="text-white font-medium">{formData.minPurchase || '1'} shares</p>
                 </div>
               </div>
             </div>
