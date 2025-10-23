@@ -79,12 +79,13 @@
 ;; PUBLIC FUNCTIONS
 ;; ============================================
 
-;; Register a new property contract
+;; Register a new property (now creates it in property-multi contract)
 (define-public (register-property
-  (contract-addr principal)
   (name (string-ascii 32))
   (symbol (string-ascii 10))
   (total-shares uint)
+  (share-price uint)
+  (min-purchase uint)
   (location (string-utf8 256))
   (metadata-uri (string-utf8 256))
 )
@@ -94,12 +95,24 @@
       (owner tx-sender)
     )
     (asserts! (not (var-get paused)) ERR-PAUSED)
-    (asserts! (is-none (map-get? contract-to-id contract-addr)) ERR-PROPERTY-EXISTS)
     (asserts! (> total-shares u0) ERR-INVALID-DATA)
+    (asserts! (> share-price u0) ERR-INVALID-DATA)
 
-    ;; Register property
+    ;; Call property-multi contract to create the property
+    (try! (contract-call? .property-multi create-property
+      name
+      symbol
+      (some metadata-uri)
+      total-shares
+      share-price
+      min-purchase
+      location
+      owner
+    ))
+
+    ;; Register property in factory
     (map-set properties property-id {
-      contract-address: contract-addr,
+      contract-address: .property-multi, ;; Always use property-multi contract
       name: name,
       symbol: symbol,
       owner: owner,
@@ -108,9 +121,6 @@
       status: "active",
       location: location
     })
-
-    ;; Set contract mapping
-    (map-set contract-to-id contract-addr property-id)
 
     ;; Set metadata URI
     (map-set property-metadata-uris property-id metadata-uri)
@@ -136,9 +146,10 @@
     (print {
       event: "property-registered",
       property-id: property-id,
-      contract: contract-addr,
       owner: owner,
-      name: name
+      name: name,
+      total-shares: total-shares,
+      share-price: share-price
     })
 
     (ok property-id)

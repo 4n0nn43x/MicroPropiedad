@@ -10,6 +10,11 @@ path = 'contracts/property.clar'
 clarity_version = 3
 epoch = 'latest'
 
+[contracts.property-multi]
+path = 'contracts/property-multi.clar'
+clarity_version = 3
+epoch = 'latest'
+
 [contracts.property-factory]
 path = 'contracts/property-factory.clar'
 clarity_version = 3

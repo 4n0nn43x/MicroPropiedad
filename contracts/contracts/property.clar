@@ -144,6 +144,9 @@
   (begin
     (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-AUTHORIZED)
     (asserts! (is-eq (var-get total-shares) u0) ERR-NOT-AUTHORIZED) ;; Can only init once
+    (asserts! (> total u0) ERR-INVALID-AMOUNT)
+    (asserts! (> price-micro-stx u0) ERR-INVALID-AMOUNT)
+    (asserts! (and (> min-buy u0) (<= min-buy total)) ERR-INVALID-AMOUNT) ;; min-buy must be 1+ and <= total
 
     (var-set property-name name)
     (var-set property-symbol symbol)
@@ -152,6 +155,15 @@
     (var-set share-price-micro-stx price-micro-stx)
     (var-set min-purchase min-buy)
     (var-set property-address addr)
+
+    (print {
+      event: "property-initialized",
+      name: name,
+      symbol: symbol,
+      total-shares: total,
+      share-price: price-micro-stx,
+      min-purchase: min-buy
+    })
 
     (ok true)
   )
@@ -162,13 +174,18 @@
   (let
     (
       (buyer tx-sender)
-      (cost (* num-shares (var-get share-price-micro-stx)))
+      (price-per-share (var-get share-price-micro-stx))
       (remaining-shares (- (var-get total-shares) (var-get shares-sold)))
+      (min-buy (var-get min-purchase))
+      (cost (* num-shares price-per-share))
     )
+    ;; Validations
     (asserts! (not (var-get paused)) ERR-PAUSED)
     (asserts! (var-get sale-active) ERR-SALE-NOT-ACTIVE)
-    (asserts! (>= num-shares (var-get min-purchase)) ERR-INVALID-AMOUNT)
+    (asserts! (> num-shares u0) ERR-INVALID-AMOUNT)
+    (asserts! (>= num-shares min-buy) ERR-INVALID-AMOUNT) ;; Respect minimum purchase
     (asserts! (<= num-shares remaining-shares) ERR-INSUFFICIENT-SHARES)
+    (asserts! (> cost u0) ERR-INVALID-AMOUNT) ;; Ensure cost is positive
 
     ;; Transfer STX from buyer to contract
     (try! (stx-transfer? cost buyer (as-contract tx-sender)))
@@ -183,7 +200,9 @@
       event: "purchase-shares",
       buyer: buyer,
       num-shares: num-shares,
-      cost: cost
+      price-per-share: price-per-share,
+      total-cost: cost,
+      remaining-shares: (- remaining-shares num-shares)
     })
 
     (ok num-shares)
@@ -231,13 +250,17 @@
       (round-data (unwrap! (map-get? payout-rounds round-id) ERR-NO-PAYOUT-AVAILABLE))
       (total-round-amount (get total-amount round-data))
       (total-shares-snapshot (get total-shares-snapshot round-data))
+      ;; Precise proportional calculation: (shares * amount) / total_shares
       (claimer-portion (/ (* holder-shares total-round-amount) total-shares-snapshot))
     )
+    ;; Validations
     (asserts! (not (var-get paused)) ERR-PAUSED)
     (asserts! (> holder-shares u0) ERR-INSUFFICIENT-BALANCE)
+    (asserts! (> total-shares-snapshot u0) ERR-INVALID-AMOUNT) ;; Prevent division by zero
     (asserts! (is-none (map-get? claimed-payouts { round: round-id, holder: claimer })) ERR-ALREADY-CLAIMED)
+    (asserts! (> claimer-portion u0) ERR-INVALID-AMOUNT) ;; Ensure claimable amount > 0
 
-    ;; Mark as claimed
+    ;; Mark as claimed BEFORE transfer (checks-effects-interactions pattern)
     (map-set claimed-payouts { round: round-id, holder: claimer } true)
 
     ;; Transfer STX from contract to claimer
@@ -248,7 +271,9 @@
       round: round-id,
       claimer: claimer,
       amount: claimer-portion,
-      shares: holder-shares
+      shares: holder-shares,
+      total-shares: total-shares-snapshot,
+      percentage: (/ (* holder-shares u10000) total-shares-snapshot) ;; Basis points
     })
 
     (ok claimer-portion)
@@ -264,6 +289,19 @@
   (begin
     (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-AUTHORIZED)
     (var-set sale-active active)
+    (print { event: "sale-status-changed", active: active })
+    (ok true)
+  )
+)
+
+;; Update minimum purchase amount (owner can adjust dynamically)
+(define-public (set-min-purchase (new-min uint))
+  (begin
+    (asserts! (is-eq tx-sender CONTRACT-OWNER) ERR-NOT-AUTHORIZED)
+    (asserts! (> new-min u0) ERR-INVALID-AMOUNT)
+    (asserts! (<= new-min (var-get total-shares)) ERR-INVALID-AMOUNT)
+    (var-set min-purchase new-min)
+    (print { event: "min-purchase-updated", min-purchase: new-min })
     (ok true)
   )
 )

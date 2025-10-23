@@ -135,17 +135,32 @@ export default function PropertyDetailPage() {
       return;
     }
 
+    const minPurchase = property.minPurchase || 1;
+
+    // Validation côté client
+    if (numShares < minPurchase) {
+      alert(`Minimum purchase is ${minPurchase} shares`);
+      return;
+    }
+
+    if (numShares > availableShares) {
+      alert(`Only ${availableShares} shares available`);
+      return;
+    }
+
     setIsPurchasing(true);
 
     try {
       await purchaseShares(
-        `${property.contractAddress}.${property.contractName}`,
+        parseInt(property.id), // Use property ID instead of contract address
         numShares,
         property.sharePrice,
+        minPurchase,
         {
           onFinish: (data) => {
             alert(t('alerts.purchaseSuccess', { txId: data.txId }));
             setShowPurchaseModal(false);
+            setNumShares(minPurchase); // Reset to minimum
           },
           onCancel: () => {
             alert(t('alerts.purchaseCancelled'));
@@ -154,7 +169,7 @@ export default function PropertyDetailPage() {
       );
     } catch (error) {
       console.error('Purchase error:', error);
-      alert(t('alerts.purchaseFailed'));
+      alert(t('alerts.purchaseFailed') + (error instanceof Error ? ': ' + error.message : ''));
     } finally {
       setIsPurchasing(false);
     }
@@ -504,15 +519,21 @@ export default function PropertyDetailPage() {
                 </label>
                 <input
                   type="number"
-                  min="1"
+                  min={property.minPurchase || 1}
                   max={availableShares}
+                  step="1"
                   value={numShares}
-                  onChange={(e) => setNumShares(parseInt(e.target.value) || 1)}
+                  onChange={(e) => setNumShares(parseInt(e.target.value) || property.minPurchase || 1)}
                   className="input-dark w-full"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  {t('modal.availableLabel', { amount: availableShares.toLocaleString() })}
-                </p>
+                <div className="flex justify-between text-xs mt-1">
+                  <p className="text-gray-500">
+                    Min: {property.minPurchase || 1} shares
+                  </p>
+                  <p className="text-gray-500">
+                    {t('modal.availableLabel', { amount: availableShares.toLocaleString() })}
+                  </p>
+                </div>
               </div>
 
               {/* Summary */}
