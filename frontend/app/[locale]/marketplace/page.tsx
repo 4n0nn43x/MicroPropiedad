@@ -60,10 +60,11 @@ export default function MarketplacePage() {
     .sort((a, b) => b.roi - a.roi)
     .slice(0, 2)
     .map((prop, idx) => ({
+      id: prop.id,
       name: prop.name,
       location: prop.location,
-      avatar: String(idx + 1),
-      totalValue: `${(prop.totalShares * prop.sharePrice).toFixed(2)} sBTC`,
+      image: prop.image,
+      totalValue: `${(prop.totalShares * prop.sharePrice).toFixed(2)} STX`,
       change: `+${prop.roi.toFixed(1)}%`,
       positive: true,
       investors: String(prop.totalShares - prop.availableShares), // Approximate from sold shares
@@ -191,7 +192,7 @@ export default function MarketplacePage() {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-dark-border">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Share Price</p>
-                    <p className="font-bold text-white">{property.sharePrice} sBTC</p>
+                    <p className="font-bold text-white">{property.sharePrice} STX</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500 mb-1">Available</p>
@@ -234,17 +235,20 @@ export default function MarketplacePage() {
 
           {/* Table Body */}
           <div className="divide-y divide-dark-border">
-            {topProperties.map((prop, idx) => (
-              <div
-                key={idx}
+            {topProperties.map((prop) => (
+              <Link
+                key={prop.id}
+                href={`/${locale}/marketplace/${prop.id}`}
                 className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-dark-hover transition cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-primary-500 to-accent-purple">
-                    <img
-                      src={`https://i.pravatar.cc/150?img=${prop.avatar}`}
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                    <Image
+                      src={prop.image}
                       alt={prop.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="48px"
+                      className="object-cover"
                     />
                   </div>
                   <div>
@@ -263,7 +267,7 @@ export default function MarketplacePage() {
                 </div>
                 <div className="flex items-center text-gray-400">{prop.investors}</div>
                 <div className="flex items-center text-gray-400">{prop.shares}</div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

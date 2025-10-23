@@ -29,6 +29,17 @@ export default function PropertyAnalyticsPage() {
 
   const isLoading = propertyLoading || analyticsLoading;
 
+  // Debug log
+  if (property && analytics && !isLoading) {
+    console.log('\n📊 ANALYTICS PAGE DEBUG');
+    console.log('Property ID:', propertyId);
+    console.log('Connected address:', address);
+    console.log('Property owner:', property.owner);
+    console.log('Analytics:', analytics);
+    console.log('Sold shares:', property.soldShares);
+    console.log('Total investors:', analytics.totalInvestors);
+  }
+
   // Check if user is the owner
   const isOwner = property && address && property.owner.toLowerCase() === address.toLowerCase();
 
@@ -137,31 +148,31 @@ export default function PropertyAnalyticsPage() {
 
             <div className="glass-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-400">Total Investors</p>
+                <p className="text-sm text-gray-400">Total Revenue</p>
                 <div className="w-10 h-10 rounded-full bg-accent-purple/10 flex items-center justify-center">
-                  <Users size={20} className="text-accent-purple" />
+                  <DollarSign size={20} className="text-accent-purple" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-white mb-1">
-                {analytics?.totalInvestors || 0}
+                {formatNumber(property.soldShares * property.sharePrice)} STX
               </p>
               <p className="text-xs text-gray-500">
-                Avg: {analytics?.totalInvestors > 0 ? formatNumber(property.soldShares / analytics.totalInvestors) : 0} shares/investor
+                From {property.soldShares} shares sold
               </p>
             </div>
 
             <div className="glass-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-400">Revenue Distributed</p>
+                <p className="text-sm text-gray-400">Potential Revenue</p>
                 <div className="w-10 h-10 rounded-full bg-accent-pink/10 flex items-center justify-center">
                   <Activity size={20} className="text-accent-pink" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-white mb-1">
-                {formatNumber(analytics?.totalPayouts || 0)} STX
+                {formatNumber((property.totalShares - property.soldShares) * property.sharePrice)} STX
               </p>
               <p className="text-xs text-gray-500">
-                {analytics?.payoutRounds || 0} payout rounds
+                {property.totalShares - property.soldShares} shares remaining
               </p>
             </div>
           </div>
@@ -200,70 +211,52 @@ export default function PropertyAnalyticsPage() {
           </div>
         </div>
 
-        {/* Investor Breakdown */}
+        {/* Sales Activity */}
         <div className="glass-card p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Investor Breakdown</h3>
-          {analytics && analytics.investors && analytics.investors.length > 0 ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-4 gap-4 px-4 py-2 text-sm font-medium text-gray-400 border-b border-dark-border">
-                <div>Investor Address</div>
-                <div>Shares Owned</div>
-                <div>Investment (STX)</div>
-                <div>Ownership %</div>
+          <h3 className="text-xl font-bold text-white mb-4">Sales Activity</h3>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-6 bg-dark-bg rounded-xl">
+              <div>
+                <p className="text-sm text-gray-400 mb-2">Total Shares Sold</p>
+                <p className="text-4xl font-bold text-white">{property.soldShares}</p>
               </div>
-              {analytics.investors.map((investor, idx) => (
-                <div key={idx} className="grid grid-cols-4 gap-4 px-4 py-3 bg-dark-bg rounded-xl hover:bg-dark-hover transition">
-                  <div className="font-mono text-sm text-white truncate">
-                    {investor.address.slice(0, 6)}...{investor.address.slice(-4)}
-                  </div>
-                  <div className="text-white font-medium">{investor.shares}</div>
-                  <div className="text-white font-medium">{formatNumber(investor.shares * property.sharePrice)} STX</div>
-                  <div className="text-accent-green font-medium">
-                    {formatNumber((investor.shares / property.totalShares) * 100)}%
-                  </div>
-                </div>
-              ))}
+              <div className="text-right">
+                <p className="text-sm text-gray-400 mb-2">Total Revenue</p>
+                <p className="text-4xl font-bold text-accent-green">{formatNumber(property.soldShares * property.sharePrice)} STX</p>
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-12">
-              <Users size={48} className="mx-auto mb-4 text-gray-600" />
-              <p className="text-gray-400">No investors yet</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Shares will appear here once purchased
-              </p>
-            </div>
-          )}
-        </div>
 
-        {/* Payout History */}
-        <div className="glass-card p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Payout History</h3>
-          {analytics && analytics.payouts && analytics.payouts.length > 0 ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-4 gap-4 px-4 py-2 text-sm font-medium text-gray-400 border-b border-dark-border">
-                <div>Round #</div>
-                <div>Total Amount</div>
-                <div>Per Share</div>
-                <div>Date</div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-4 bg-dark-bg rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">Shares Remaining</p>
+                <p className="text-2xl font-bold text-white">{property.totalShares - property.soldShares}</p>
               </div>
-              {analytics.payouts.map((payout, idx) => (
-                <div key={idx} className="grid grid-cols-4 gap-4 px-4 py-3 bg-dark-bg rounded-xl">
-                  <div className="text-white font-medium">#{payout.round}</div>
-                  <div className="text-accent-green font-medium">{formatNumber(payout.totalAmount)} STX</div>
-                  <div className="text-white">{formatNumber(payout.perShare)} STX</div>
-                  <div className="text-gray-400 text-sm">{payout.date}</div>
-                </div>
-              ))}
+              <div className="p-4 bg-dark-bg rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">Average Purchase</p>
+                <p className="text-2xl font-bold text-white">
+                  {analytics?.totalInvestors > 0 ? formatNumber(property.soldShares / analytics.totalInvestors) : '0'} shares
+                </p>
+              </div>
+              <div className="p-4 bg-dark-bg rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">Revenue per Share</p>
+                <p className="text-2xl font-bold text-white">{formatNumber(property.sharePrice)} STX</p>
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-12">
-              <Calendar size={48} className="mx-auto mb-4 text-gray-600" />
-              <p className="text-gray-400">No payouts distributed yet</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Payout history will appear here
-              </p>
-            </div>
-          )}
+
+            {property.soldShares > 0 && (
+              <div className="p-4 bg-accent-green/10 border border-accent-green/30 rounded-xl">
+                <p className="text-sm text-accent-green font-medium mb-2">
+                  🎉 Great progress! {formatNumber((property.soldShares / property.totalShares) * 100)}% funded
+                </p>
+                <p className="text-xs text-gray-400">
+                  Your property has sold {property.soldShares} out of {property.totalShares} shares.
+                  {property.totalShares - property.soldShares > 0 &&
+                    ` Only ${property.totalShares - property.soldShares} shares remaining!`
+                  }
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Quick Actions */}

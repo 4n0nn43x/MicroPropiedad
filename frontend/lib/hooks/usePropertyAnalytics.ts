@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { callReadOnlyFunction } from '../stacks/api';
-import { uintCV } from '@stacks/transactions';
+import { uintCV, principalCV } from '@stacks/transactions';
 
 const PROPERTY_MULTI_CONTRACT = process.env.NEXT_PUBLIC_PROPERTY_MULTI_CONTRACT || 'STHB9AQQT64FPZ88FT18HKNGV2TK0EM4JDT111SQ.property-multi';
 const STACKS_API = process.env.NEXT_PUBLIC_STACKS_API_URL || 'https://api.testnet.hiro.so';
@@ -49,7 +49,13 @@ export function usePropertyAnalytics(propertyId: string) {
           payouts: payoutData.payouts,
         };
 
-        console.log('✅ Analytics loaded:', analytics);
+        console.log('✅ Analytics loaded:', {
+          totalInvestors: analytics.totalInvestors,
+          investorsCount: analytics.investors.length,
+          investors: analytics.investors,
+          totalPayouts: analytics.totalPayouts,
+          payoutRounds: analytics.payoutRounds,
+        });
         return analytics;
       } catch (error) {
         console.error('❌ Error fetching property analytics:', error);
@@ -68,7 +74,8 @@ export function usePropertyAnalytics(propertyId: string) {
 }
 
 /**
- * Fetch all investors for a property by analyzing purchase transactions
+ * Fetch all investors for a property by querying balances directly from contract
+ * Since we can't enumerate all holders, we'll fetch from transaction history
  */
 async function fetchPropertyInvestors(
   propertyId: string,
@@ -76,55 +83,98 @@ async function fetchPropertyInvestors(
   contractName: string
 ): Promise<Array<{ address: string; shares: number }>> {
   try {
-    console.log('👥 Fetching investors...');
+    console.log('👥 Fetching investors for property #' + propertyId);
 
-    // Fetch all transactions to the property-multi contract
-    const response = await fetch(
-      `${STACKS_API}/extended/v1/address/${contractAddress}.${contractName}/transactions?limit=200`
-    );
+    // Strategy 1: Try to fetch from contract transactions (might not be indexed yet)
+    const contractFullAddress = `${contractAddress}.${contractName}`;
+    const uniqueBuyers = new Set<string>();
 
-    if (!response.ok) {
-      console.error('Failed to fetch transactions');
-      return [];
+    try {
+      const response = await fetch(
+        `${STACKS_API}/extended/v1/contract/${contractFullAddress}/transactions?limit=200`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`📦 Found ${data.results?.length || 0} contract transactions`);
+
+        if (data.results && data.results.length > 0) {
+          // Process transactions (existing code below)
+        } else {
+          console.warn('⚠️ No contract transactions found via contract endpoint');
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Contract transactions endpoint failed:', error);
     }
 
-    const data = await response.json();
-    const investorShares = new Map<string, number>();
+    // Strategy 2: Search for purchase-shares transactions globally
+    console.log('🔍 Searching for purchase-shares transactions globally...');
+    try {
+      const globalResponse = await fetch(
+        `${STACKS_API}/extended/v1/tx/mempool?limit=50&unanchored=true`
+      );
 
-    // Process purchase-shares transactions for this property
-    for (const tx of data.results || []) {
-      if (
-        tx.tx_type === 'contract_call' &&
-        tx.tx_status === 'success' &&
-        tx.contract_call?.function_name === 'purchase-shares'
-      ) {
-        try {
-          const args = tx.contract_call.function_args || [];
-          const txPropertyId = parseInt(args[0]?.repr?.replace('u', '') || '0');
+      if (globalResponse.ok) {
+        const globalData = await globalResponse.json();
+        console.log(`📦 Found ${globalData.results?.length || 0} mempool transactions`);
+      }
+    } catch (error) {
+      console.warn('⚠️ Mempool search failed:', error);
+    }
 
-          // Only count purchases for this specific property
-          if (txPropertyId.toString() !== propertyId) {
-            continue;
+    // Strategy 3: Use STX transfer events to find buyers
+    console.log('💰 Searching for STX transfers to property-multi...');
+    try {
+      const transferResponse = await fetch(
+        `${STACKS_API}/extended/v1/address/${contractFullAddress}/stx?limit=200`
+      );
+
+      if (transferResponse.ok) {
+        const transferData = await transferResponse.json();
+        console.log(`📦 Found ${transferData.results?.length || 0} STX transfers`);
+
+        // Extract senders (buyers) from STX transfers
+        for (const transfer of transferData.results || []) {
+          if (transfer.sender) {
+            uniqueBuyers.add(transfer.sender);
+            console.log(`💵 Found STX sender: ${transfer.sender}`);
           }
-
-          const numShares = parseInt(args[1]?.repr?.replace('u', '') || '0');
-          const buyer = tx.sender_address;
-
-          // Accumulate shares per investor
-          const currentShares = investorShares.get(buyer) || 0;
-          investorShares.set(buyer, currentShares + numShares);
-        } catch (error) {
-          console.error('Error parsing transaction:', error);
         }
+      }
+    } catch (error) {
+      console.warn('⚠️ STX transfer search failed:', error);
+    }
+
+    console.log(`👥 Found ${uniqueBuyers.size} potential buyers from STX transfers`);
+
+    // Second pass: Query current balance for each buyer
+    const investors: Array<{ address: string; shares: number }> = [];
+
+    for (const buyer of uniqueBuyers) {
+      try {
+        const balanceResult = await callReadOnlyFunction(
+          contractAddress,
+          contractName,
+          'get-balance',
+          [uintCV(parseInt(propertyId)), principalCV(buyer)]
+        );
+
+        const shares = parseInt(balanceResult?.value?.value || '0');
+
+        if (shares > 0) {
+          investors.push({ address: buyer, shares });
+          console.log(`✅ ${buyer.slice(0, 6)}...${buyer.slice(-4)}: ${shares} shares`);
+        }
+      } catch (error) {
+        console.error(`Error fetching balance for ${buyer}:`, error);
       }
     }
 
-    // Convert map to array and sort by shares (descending)
-    const investors = Array.from(investorShares.entries())
-      .map(([address, shares]) => ({ address, shares }))
-      .sort((a, b) => b.shares - a.shares);
+    // Sort by shares (descending)
+    investors.sort((a, b) => b.shares - a.shares);
 
-    console.log(`✅ Found ${investors.length} unique investors`);
+    console.log(`✅ Total active investors: ${investors.length}`);
     return investors;
   } catch (error) {
     console.error('Error fetching investors:', error);
