@@ -25,7 +25,7 @@ export default function ClaimPayoutPage() {
   const t = useTranslations('claim');
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
-  const { connected, connect, userAddress } = useWallet();
+  const { connected, connect, address: userAddress } = useWallet();
 
   const [payoutRounds, setPayoutRounds] = useState<PayoutRound[]>([]);
   const [isLoading, setIsLoading] = useState(true);
