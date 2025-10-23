@@ -60,15 +60,6 @@ npm run dev:backend
 # Terminal 3: Contracts Devnet (optional, for local testing)
 npm run dev:contracts
 ```
-
-> **Note:** Le backend est optionnel pour un MVP/démo car le frontend peut communiquer directement avec la blockchain. Cependant, le backend devient **ESSENTIEL** en production pour:
-> - ✅ Distribution automatique des loyers (Oracle)
-> - ✅ KYC/Conformité légale
-> - ✅ Performance optimisée (caching)
-> - ✅ Notifications
->
-> Voir [BACKEND_NECESSITY.md](./BACKEND_NECESSITY.md) pour plus de détails.
-
 ## 🔧 Initial Setup
 
 ### 1. Install All Dependencies

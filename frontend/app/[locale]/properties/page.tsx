@@ -38,7 +38,7 @@ export default function MyPropertiesPage() {
 
   // Filter properties owned by current user (registered by their wallet)
   const myProperties = allProperties?.filter(prop =>
-    prop.owner.toLowerCase() === address?.toLowerCase()
+    prop.owner && address && prop.owner.toLowerCase() === address.toLowerCase()
   ) || [];
 
   // Log for debugging
@@ -48,9 +48,9 @@ export default function MyPropertiesPage() {
     console.log('📊 Total properties in system:', allProperties.length);
     console.log('🏘️ Properties owned by me:', myProperties.length);
     allProperties.forEach((prop, idx) => {
-      const isOwned = prop.owner.toLowerCase() === address.toLowerCase();
+      const isOwned = prop.owner && prop.owner.toLowerCase() === address.toLowerCase();
       console.log(`  [${idx + 1}] ${prop.name}`, {
-        owner: prop.owner,
+        owner: prop.owner || 'N/A',
         isOwnedByMe: isOwned ? '✅ YES' : '❌ NO',
       });
     });

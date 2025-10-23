@@ -259,32 +259,28 @@ export function useUserPortfolio(userAddress?: string) {
         try {
           const [contractAddress, contractName] = [property.contractAddress, property.contractName];
 
-          // Get user balance
+          // Get user balance from property-multi contract (takes property-id and holder)
           const balanceResult = await callReadOnlyFunction(
             contractAddress,
             contractName,
             'get-balance',
-            [principalCV(userAddress)]
+            [uintCV(parseInt(property.id)), principalCV(userAddress)]
           );
 
           const shares = parseInt(balanceResult?.value?.value || '0');
+          console.log(`📊 Portfolio: Property #${property.id} - User ${userAddress} has ${shares} shares`);
 
           if (shares > 0) {
-            // Get property info
-            const infoResult = await callReadOnlyFunction(
-              contractAddress,
-              contractName,
-              'get-property-info'
-            );
-
-            const sharePrice = parseInt(infoResult?.value?.value?.['share-price']?.value || '0') / 1000000;
+            // Use share price from property data (already fetched in useProperties)
+            const sharePrice = property.sharePrice;
             const invested = shares * sharePrice;
 
-            // Get current payout round
+            // Get current payout round for this property
             const roundResult = await callReadOnlyFunction(
               contractAddress,
               contractName,
-              'get-current-round'
+              'get-current-round',
+              [uintCV(parseInt(property.id))]
             );
 
             const currentRound = parseInt(roundResult?.value?.value || '0');
@@ -296,7 +292,7 @@ export function useUserPortfolio(userAddress?: string) {
                 contractAddress,
                 contractName,
                 'calculate-claimable',
-                [uintCV(currentRound), principalCV(userAddress)]
+                [uintCV(parseInt(property.id)), uintCV(currentRound), principalCV(userAddress)]
               );
 
               const alreadyClaimed = claimableResult?.value?.value?.['already-claimed']?.value === true;
@@ -305,11 +301,17 @@ export function useUserPortfolio(userAddress?: string) {
               }
             }
 
+            console.log(`✅ Portfolio: Adding property #${property.id} with ${shares} shares, invested: ${invested} STX`);
+
+            // Current value is the same as invested (shares are not tradeable yet, no price appreciation)
+            // In the future, this could be calculated based on a price oracle or market data
+            const currentValue = invested;
+
             portfolio.push({
               ...property,
               sharesOwned: shares,
               invested,
-              currentValue: invested * 1.1, // Rough estimate, would need price oracle
+              currentValue,
               currentRound,
               claimableAmount,
             });
@@ -400,16 +402,21 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
   try {
     console.log(`\n🔧 PARSING PROPERTY #${id}`);
     console.log('📦 Raw contract data structure:', Object.keys(data));
-    console.log('📦 Full raw data:', data);
+    console.log('📦 Full raw data:', JSON.stringify(data, null, 2));
 
     // The data structure from our property-factory contract:
     // contract-address, name, symbol, owner, total-shares, created-at, status, location
     // metadata-uri is in a SEPARATE map that we fetch separately
     // Note: Clarity responses are nested: data.value.value contains the actual tuple data
     const level1 = data.value || data;
+    console.log('📦 Level 1 (after data.value):', JSON.stringify(level1, null, 2));
+
     const actualData = level1.value || level1;
-    console.log('📦 Actual data to parse (after unwrapping):', actualData);
+    console.log('📦 Actual data to parse (after unwrapping):', JSON.stringify(actualData, null, 2));
     console.log('📦 Keys available:', Object.keys(actualData));
+    console.log('📦 Type of actualData:', typeof actualData);
+    console.log('📦 actualData.owner:', actualData.owner);
+    console.log('📦 actualData.owner?.value:', actualData.owner?.value);
 
     const contractAddressFull = actualData['contract-address']?.value || '';
     const [contractAddress, contractName] = contractAddressFull.includes('.')
@@ -499,11 +506,32 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
       documentCount: metadata?.documents?.length || 0,
     });
 
+    // Validate owner exists - if not, return null to skip this property
+    if (!contractOwner) {
+      console.warn(`⚠️ Property #${id} has no owner, skipping...`);
+      return null;
+    }
+
+    // Fetch soldShares from property-multi contract
+    let soldShares = 0;
+    try {
+      const soldSharesResult = await callReadOnlyFunction(
+        contractAddress,
+        contractName,
+        'get-shares-sold',
+        [uintCV(id)]
+      );
+      soldShares = parseInt(soldSharesResult?.value?.value || '0');
+      console.log(`📊 Property #${id} - Shares sold: ${soldShares}/${totalShares}`);
+    } catch (error) {
+      console.warn(`⚠️ Could not fetch soldShares for property #${id}, defaulting to 0`);
+    }
+
     const result = {
       id: id.toString(),
       contractAddress: contractAddress || 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
       contractName: contractName || `property-${id}`,
-      owner: contractOwner || 'Unknown',
+      owner: contractOwner,
       name,
       location,
       description,
@@ -512,7 +540,7 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
       propertyType: metadata?.propertyType,
       sharePrice,
       totalShares,
-      soldShares: 0, // Will be fetched from property contract
+      soldShares,
       roi,
       status: (contractStatus || 'active') as 'active' | 'sold-out' | 'upcoming',
       estimatedAnnualReturn: roi,

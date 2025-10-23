@@ -548,7 +548,9 @@ export default function PropertyDetailPage() {
                 </div>
                 <div className="border-t border-dark-border pt-3 flex justify-between">
                   <span className="text-white font-bold">{t('modal.summary.totalCost')}</span>
-                  <span className="text-white font-bold">{(property.sharePrice * numShares).toFixed(2)} STX</span>
+                  <span className="text-white font-bold">
+                    {(property.sharePrice * numShares).toFixed(2)} STX
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">{t('modal.summary.monthlyReturn')}</span>

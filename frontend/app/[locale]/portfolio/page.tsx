@@ -10,6 +10,24 @@ import { useUserPortfolio } from '@/lib/hooks/useProperties';
 import { claimPayout } from '@/lib/stacks/contracts';
 import { useTranslations } from 'next-intl';
 
+/**
+ * Format number with smart decimal handling
+ * - If number is close to zero (< 0.01), show up to 4 decimals
+ * - Otherwise show 2 decimals max, removing trailing zeros
+ */
+function formatNumber(num: number, maxDecimals: number = 2): string {
+  // Handle very small numbers
+  if (Math.abs(num) < 0.01 && num !== 0) {
+    return num.toFixed(4).replace(/\.?0+$/, '');
+  }
+
+  // Round to avoid floating point errors (e.g., 10.000000000000009)
+  const rounded = Math.round(num * Math.pow(10, maxDecimals)) / Math.pow(10, maxDecimals);
+
+  // Format and remove trailing zeros
+  return rounded.toFixed(maxDecimals).replace(/\.?0+$/, '');
+}
+
 export default function PortfolioPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
@@ -39,10 +57,13 @@ export default function PortfolioPage() {
   const stats = portfolio && portfolio.length > 0 ? {
     totalInvested: portfolio.reduce((sum, inv) => sum + inv.invested, 0),
     currentValue: portfolio.reduce((sum, inv) => sum + inv.currentValue, 0),
-    totalReturns: portfolio.reduce((sum, inv) => sum + (inv.currentValue - inv.invested), 0),
-    returnPercentage: portfolio.reduce((sum, inv) => sum + inv.invested, 0) > 0
-      ? ((portfolio.reduce((sum, inv) => sum + (inv.currentValue - inv.invested), 0) /
-          portfolio.reduce((sum, inv) => sum + inv.invested, 0)) * 100)
+    // Calculate estimated annual returns based on property ROI
+    // This represents expected dividend income, not capital appreciation
+    estimatedAnnualReturns: portfolio.reduce((sum, inv) => sum + (inv.invested * (inv.roi / 100)), 0),
+    // Average ROI across all investments (weighted by investment amount)
+    averageRoi: portfolio.reduce((sum, inv) => sum + inv.invested, 0) > 0
+      ? portfolio.reduce((sum, inv) => sum + (inv.invested * inv.roi), 0) /
+        portfolio.reduce((sum, inv) => sum + inv.invested, 0)
       : 0,
     propertiesOwned: portfolio.length,
     totalShares: portfolio.reduce((sum, inv) => sum + inv.sharesOwned, 0),
@@ -50,8 +71,8 @@ export default function PortfolioPage() {
   } : {
     totalInvested: 0,
     currentValue: 0,
-    totalReturns: 0,
-    returnPercentage: 0,
+    estimatedAnnualReturns: 0,
+    averageRoi: 0,
     propertiesOwned: 0,
     totalShares: 0,
     claimableTotal: 0,
@@ -62,8 +83,8 @@ export default function PortfolioPage() {
     console.log('📈 Portfolio stats calculated:', {
       totalInvested: stats.totalInvested.toFixed(2) + ' STX',
       currentValue: stats.currentValue.toFixed(2) + ' STX',
-      totalReturns: stats.totalReturns.toFixed(2) + ' STX',
-      returnPercentage: stats.returnPercentage.toFixed(2) + '%',
+      estimatedAnnualReturns: stats.estimatedAnnualReturns.toFixed(2) + ' STX/year',
+      averageRoi: stats.averageRoi.toFixed(2) + '%',
       propertiesOwned: stats.propertiesOwned,
       totalShares: stats.totalShares,
       claimableTotal: stats.claimableTotal.toFixed(4) + ' STX',
@@ -152,8 +173,8 @@ export default function PortfolioPage() {
               <p className="text-gray-400">{t('claimable.description')}</p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-accent-green">{stats.claimableTotal.toFixed(4)} STX</p>
-              <p className="text-sm text-gray-500">{t('claimable.usdApprox', { amount: (stats.claimableTotal * 0.5).toFixed(2) })}</p>
+              <p className="text-3xl font-bold text-accent-green">{formatNumber(stats.claimableTotal, 4)} STX</p>
+              <p className="text-sm text-gray-500">{t('claimable.usdApprox', { amount: formatNumber(stats.claimableTotal * 0.5) })}</p>
             </div>
           </div>
         </div>
@@ -169,35 +190,35 @@ export default function PortfolioPage() {
             </div>
           </div>
           <p className="text-3xl font-bold text-white mb-1">
-            ${stats.totalInvested.toLocaleString()}
+            {formatNumber(stats.totalInvested)} STX
           </p>
           <p className="text-xs text-gray-500">{stats.propertiesOwned} {t('stats.properties')}</p>
         </div>
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">{t('stats.currentValue')}</p>
+            <p className="text-sm text-gray-400">Est. Annual Returns</p>
             <div className="w-10 h-10 rounded-full bg-accent-green/10 flex items-center justify-center">
               <TrendingUp size={20} className="text-accent-green" />
             </div>
           </div>
           <p className="text-3xl font-bold text-white mb-1">
-            ${stats.currentValue.toLocaleString()}
+            {formatNumber(stats.estimatedAnnualReturns)} STX
           </p>
-          <p className="text-xs text-accent-green">+${stats.totalReturns.toLocaleString()} {t('stats.total')}</p>
+          <p className="text-xs text-accent-green">~{formatNumber(stats.estimatedAnnualReturns / 12)} STX/month</p>
         </div>
 
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-400">{t('stats.totalReturns')}</p>
+            <p className="text-sm text-gray-400">Average ROI</p>
             <div className="w-10 h-10 rounded-full bg-accent-purple/10 flex items-center justify-center">
               <Percent size={20} className="text-accent-purple" />
             </div>
           </div>
           <p className="text-3xl font-bold text-white mb-1">
-            {stats.returnPercentage}%
+            {formatNumber(stats.averageRoi)}%
           </p>
-          <p className="text-xs text-gray-500">{t('stats.averageRoi')}</p>
+          <p className="text-xs text-gray-500">Weighted average</p>
         </div>
 
         <div className="glass-card p-6">
@@ -269,29 +290,31 @@ export default function PortfolioPage() {
                       {investment.sharesOwned} / {investment.totalShares}
                     </p>
                     <p className="text-xs text-gray-600">
-                      {((investment.sharesOwned / investment.totalShares) * 100).toFixed(2)}%
+                      {formatNumber((investment.sharesOwned / investment.totalShares) * 100)}%
                     </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 mb-1">{t('investments.invested')}</p>
                     <p className="text-sm font-bold text-white">
-                      {investment.invested.toFixed(2)} STX
+                      {formatNumber(investment.invested)} STX
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">{t('investments.currentValue')}</p>
+                    <p className="text-xs text-gray-500 mb-1">Expected ROI</p>
                     <p className="text-sm font-bold text-white">
-                      {investment.currentValue.toFixed(2)} STX
+                      {formatNumber(investment.roi)}%
                     </p>
+                    <p className="text-xs text-gray-600">Annual</p>
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">{t('investments.returns')}</p>
+                    <p className="text-xs text-gray-500 mb-1">Est. Annual Income</p>
                     <p className="text-sm font-bold text-accent-green">
-                      +{(investment.currentValue - investment.invested).toFixed(2)} STX ({(((investment.currentValue - investment.invested) / investment.invested) * 100).toFixed(1)}%)
+                      ~{formatNumber(investment.invested * (investment.roi / 100))} STX
                     </p>
+                    <p className="text-xs text-gray-600">~{formatNumber(investment.invested * (investment.roi / 100) / 12)} STX/mo</p>
                   </div>
 
                   <div>
@@ -299,7 +322,7 @@ export default function PortfolioPage() {
                     {investment.claimableAmount > 0 ? (
                       <>
                         <p className="text-sm font-bold text-accent-green">
-                          {investment.claimableAmount.toFixed(4)} STX
+                          {formatNumber(investment.claimableAmount, 4)} STX
                         </p>
                         <p className="text-xs text-accent-green">Round #{investment.currentRound}</p>
                       </>
@@ -326,7 +349,7 @@ export default function PortfolioPage() {
                           : 'bg-accent-green hover:bg-accent-green/90 text-white'
                       }`}
                     >
-                      {claimingPropertyId === investment.id ? t('investments.claiming') : t('investments.claimButton', { amount: investment.claimableAmount.toFixed(4) })}
+                      {claimingPropertyId === investment.id ? t('investments.claiming') : t('investments.claimButton', { amount: formatNumber(investment.claimableAmount, 4) })}
                     </button>
                   )}
                   <button
