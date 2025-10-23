@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { MoreVertical, Edit, Trash2, Eye, Users, DollarSign, TrendingUp, Wallet, Building2 } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Users, DollarSign, TrendingUp, Wallet, Building2, BarChart3 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useProperties } from '@/lib/hooks/useProperties';
@@ -213,6 +213,13 @@ export default function MyPropertiesPage() {
                       </button>
                       {menuOpen === property.id && (
                         <div className="absolute right-0 mt-2 w-48 bg-dark-card border border-dark-border rounded-xl shadow-2xl overflow-hidden z-10">
+                          <Link
+                            href={`/${locale}/properties/${property.id}/analytics`}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-hover hover:text-white transition"
+                          >
+                            <BarChart3 size={16} />
+                            <span>Analytics</span>
+                          </Link>
                           <Link
                             href={`/${locale}/marketplace/${property.id}`}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-hover hover:text-white transition"
