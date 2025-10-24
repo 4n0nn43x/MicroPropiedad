@@ -121,6 +121,7 @@ export default function AddPropertyPage() {
           totalShares: Number(formData.totalShares),
           sharePrice: sharePrice,
           expectedReturn: Number(formData.expectedReturn) || 8,
+          minPurchase: Number(formData.minPurchase) || 1,
         },
         details: {
           bedrooms: Number(formData.bedrooms) || 0,

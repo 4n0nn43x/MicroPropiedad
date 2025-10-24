@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -39,6 +39,13 @@ export default function PropertyDetailPage() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [numShares, setNumShares] = useState(1);
   const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // Initialize numShares with minPurchase when property loads
+  useEffect(() => {
+    if (property?.minPurchase && numShares < property.minPurchase) {
+      setNumShares(property.minPurchase);
+    }
+  }, [property?.minPurchase]);
 
   // Log property data when loaded
   if (property && !isLoading) {
@@ -487,7 +494,7 @@ export default function PropertyDetailPage() {
 
               {/* Info */}
               <div className="text-xs text-gray-500 space-y-2">
-                <p>{t('info.minPurchase')}</p>
+                <p>• Minimum purchase: {property.minPurchase || 1} {property.minPurchase === 1 ? 'share' : 'shares'}</p>
                 <p>{t('info.dividend')}</p>
                 <p>{t('info.secured')}</p>
               </div>

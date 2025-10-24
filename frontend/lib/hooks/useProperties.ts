@@ -502,6 +502,8 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
       sharePrice,
       roi,
       propertyValue,
+      minPurchase: metadata?.financials?.minPurchase || 1,
+      minPurchaseRaw: metadata?.financials?.minPurchase,
       hasDetails: !!metadata?.details,
       detailsData: metadata?.details,
       documentCount: metadata?.documents?.length || 0,
@@ -555,6 +557,7 @@ async function parsePropertyData(id: number, data: any, metadataUriData?: any): 
     };
 
     console.log('✅ Final property object created');
+    console.log('🔍 Final minPurchase value:', result.minPurchase, '(from metadata:', metadata?.financials?.minPurchase, ')');
     console.log('🏁 PARSING COMPLETE FOR PROPERTY #' + id + '\n');
 
     return result;
